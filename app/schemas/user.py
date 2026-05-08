@@ -1,11 +1,11 @@
 from pydantic import BaseModel, ConfigDict
 
-class userScheme(BaseModel):
+class userRequest(BaseModel):
     name: str
-    surname: str
+    password: str
 
 class userOutScheme(BaseModel):
-    name: str
-    surname: str
+    login: str
+    password_hash: str
 
     model_config = ConfigDict(from_attributes=True)

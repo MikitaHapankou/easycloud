@@ -3,9 +3,7 @@ from fastapi import FastAPI
 from app.routers import userRouter
 
 #Database
-import app.models
 from app.db.database import Base, engine
-from app.services.userService import get_users, add_users
 
 app = FastAPI()
 
