@@ -14,4 +14,4 @@ engine = create_engine(f"postgresql://{USERNAME}:{PASSWORD}@localhost:5432/{DBNA
 
 Base = declarative_base()
 
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+LocalSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
