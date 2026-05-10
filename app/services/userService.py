@@ -1,5 +1,6 @@
 from app.models.user import User
 from .security import hash_password, check_password
+from datetime import datetime
 
 def get_users(db):
     users = db.query(User).all()
@@ -8,7 +9,8 @@ def get_users(db):
 def add_user(login: str, password: str, db):
     try:
         password_hash = hash_password(password)
-        new_user = User(login=login, password_hash=password_hash)
+        now = datetime.now()
+        new_user = User(login=login, password_hash=password_hash, created_at=now)
         db.add(new_user)
         db.commit()
         return new_user
