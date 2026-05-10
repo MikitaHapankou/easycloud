@@ -1,9 +1,16 @@
+#config
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 # Fastapi
 from fastapi import FastAPI
 from app.routers import userRouter
 
 #Database
 from app.db.database import Base, engine
+
 
 app = FastAPI()
 

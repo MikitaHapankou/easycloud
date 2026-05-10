@@ -1,9 +1,13 @@
 from fastapi import FastAPI, APIRouter
 from app.schemas.user import userRequest, userOutScheme
 from app.dependencies import get_db
+from app.services.security import create_token, get_current_user
 from sqlalchemy.orm import Session
 from app.services.userService import add_user, get_users, auth
 from fastapi import HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+bearer = HTTPBearer()
 app = FastAPI()
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -34,5 +38,20 @@ def auth_user(user: userRequest, db: Session = Depends(get_db)):
         print(e)
         raise HTTPException(status_code = 500, detail="Internal server error")
 
-    if is_authenticated: return {"detail": "Success"}
+    if is_authenticated:
+        payload = {"sub": user.name}
+        token = create_token(payload)
+        return {"detail": "Success", "token": token}
     else: raise HTTPException(status_code = 400, detail="Wrong login or password")
+
+
+@router.get("/authenticate")
+def token(credentials: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)):
+    sent_token = credentials.credentials
+
+    try:
+        user = get_current_user(sent_token, db)
+        return user
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code = 400, detail="Wypierdalaj")

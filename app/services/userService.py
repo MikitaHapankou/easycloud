@@ -1,5 +1,4 @@
 from app.models.user import User
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from .security import hash_password, check_password
 
 def get_users(db):
