@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: #0f172a;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-card {
+            width: 350px;
+            padding: 40px;
+
+            background: #1e293b;
+            border-radius: 16px;
+
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .login-card h1 {
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #334155;
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            background: #475569;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #3b82f6;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #2563eb;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .footer-text a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+
+    <h1>mhcloud</h1>
+
+    <form id="loginForm">
+
+        <div class="input-group">
+            <label>Login</label>
+            <input type="text" id="login" placeholder="Enter your login">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+
+        <button class="login-btn" type="submit">
+            Register
+        </button>
+
+    </form>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+
+            const res = await fetch("/users/add",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({name, password})
+            })
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Registration success");
+                window.location.href = "/";
+            } else {
+                alert(data.detail);
+            }
+        });
+    </script>
+
+    <div class="footer-text">
+        Already have an account?
+        <a href="/">Login</a>
+    </div>
+
+</div>
+
+</body>
+</html>

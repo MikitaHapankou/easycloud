@@ -44,7 +44,6 @@ def auth_user(user: userRequest, db: Session = Depends(get_db)):
         return {"detail": "Success", "token": token}
     else: raise HTTPException(status_code = 400, detail="Wrong login or password")
 
-
 @router.get("/authenticate")
 def token(credentials: HTTPAuthorizationCredentials = Depends(bearer), db: Session = Depends(get_db)):
     sent_token = credentials.credentials
