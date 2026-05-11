@@ -1,6 +1,8 @@
 from app.models.user import User
 from .security import hash_password, check_password
 from datetime import datetime
+import os
+from app.config.security import BASE_DIR
 
 def get_users(db):
     users = db.query(User).all()
@@ -13,6 +15,8 @@ def add_user(login: str, password: str, db):
         new_user = User(login=login, password_hash=password_hash, created_at=now)
         db.add(new_user)
         db.commit()
+        dir_path = os.path.join(BASE_DIR, new_user.login)
+        os.makedirs(dir_path, exist_ok=True)
         return new_user
     except Exception as e:
         raise e

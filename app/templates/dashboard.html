@@ -173,7 +173,7 @@
             Username
         </div>
 
-        <button class="logout-btn">
+        <button class="logout-btn" type="button" id="logout-btn">
             Logout
         </button>
 
@@ -220,26 +220,25 @@
 
 </div>
 <script>
-    addEventListener("DOMContentLoaded", async (event) => {
-        const token = localStorage.getItem("token");
+    document.getElementById("logout-btn").addEventListener("click", () => {
+        fetch ("/users/logout");
+        window.location.href="/";
+    });
 
+    addEventListener("DOMContentLoaded", async (event) => {
         const res = await fetch("/dashboard/my", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
+            credentials: "include"
         })
 
         const data = await res.json()
-        console.log(data)
+
         if (res.ok) {
             document.querySelector(".username").innerText = data.username;
             let fileList = document.getElementById("filesContainer");
             for (const filename of data.files) {
                 const a = document.createElement("a");
                 a.classList.add("file-item");
-                a.href = "/";
+                a.href = `/dashboard/download/${filename}`;
                 a.innerText = filename;
                 fileList.appendChild(a);
             }

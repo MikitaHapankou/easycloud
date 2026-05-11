@@ -1,3 +1,3 @@
-from fastapi.security import HTTPBearer
+import os
 
-bearer = HTTPBearer()
+BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_storage")
