@@ -6,18 +6,17 @@ load_dotenv()
 
 # Fastapi
 from fastapi import FastAPI, Request
-from app.routers import userRouter
-from fastapi.templating import Jinja2Templates
+from app.routers import userRouter, dashboardRouter
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 #Database
 from app.db.database import Base, engine
-
+from app.config.templates import templates
 
 app = FastAPI()
-templates = Jinja2Templates(directory="app/templates")
 
 app.include_router(userRouter.router)
+app.include_router(dashboardRouter.router)
 
 Base.metadata.create_all(bind=engine)
 

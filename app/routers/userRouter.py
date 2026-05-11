@@ -1,14 +1,11 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from app.schemas.user import userRequest, userOutScheme
 from app.dependencies import get_db
 from app.services.security import create_token, get_current_user
 from sqlalchemy.orm import Session
 from app.services.userService import add_user, get_users, auth
-from fastapi import HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-bearer = HTTPBearer()
-app = FastAPI()
+from fastapi.security import HTTPAuthorizationCredentials
+from app.config.security import bearer
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("/add")

@@ -11,4 +11,4 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True))
 
     def __repr__(self):
-        return f"<User(name='{self.login}')>"
+        return f"<User(login='{self.login}')>"
