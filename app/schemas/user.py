@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 class userRequest(BaseModel):
-    name: str
+    login: str
     password: str
 
 class userOutScheme(BaseModel):

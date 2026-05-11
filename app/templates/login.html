@@ -139,7 +139,7 @@
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById("login").value;
+            const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
 
             const res = await fetch("/users/login",{
@@ -148,7 +148,7 @@
                     "Content-Type": "application/json"
                 },
 
-                body: JSON.stringify({name, password})
+                body: JSON.stringify({login, password})
             })
 
             data = await res.json()

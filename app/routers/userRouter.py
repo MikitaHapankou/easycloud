@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.post("/add")
 def add_user_route(user: userRequest, db: Session = Depends(get_db)):
     try:
-        add_user(user.name, user.password, db)
+        add_user(user.login, user.password, db)
         return {"detail": "Success"}
     except Exception as e:
         print(e)
@@ -33,13 +33,13 @@ def get_all_users(db: Session = Depends(get_db)):
 @router.post("/login")
 def auth_user(user: userRequest, db: Session = Depends(get_db)):
     try:
-        is_authenticated = auth(user.name, user.password, db)
+        is_authenticated = auth(user.login, user.password, db)
     except Exception as e:
         print(e)
         raise HTTPException(status_code = 500, detail="Internal server error")
 
     if is_authenticated:
-        payload = {"sub": user.name}
+        payload = {"sub": user.login}
         token = create_token(payload)
         return {"detail": "Success", "token": token}
     else: raise HTTPException(status_code = 400, detail="Wrong login or password")
