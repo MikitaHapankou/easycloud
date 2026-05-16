@@ -18,10 +18,10 @@ def add_user_route(user: userRequest, db: Session = Depends(get_db)):
         else:
             raise HTTPException(status_code = 502, detail="Internal server error")
 
-@router.get("/get-all", response_model = list[userOutScheme])
+@router.get("/get-all", response_model = userOutScheme)
 def get_all_users(db: Session = Depends(get_db)):
     try:
-        return get_users(db)
+        return {"user_list": get_users(db)}
     except Exception:
         raise HTTPException(status_code = 400, detail="error")
 
