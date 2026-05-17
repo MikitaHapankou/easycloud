@@ -45,15 +45,9 @@ def logout(response: Response):
     )
 
 ### ENDPOINTS FOR TESTS SECTION
-def get_current_user(token: str = Cookie(""), db: Session = Depends(dependencies.get_db)):
-    if not token:
-        raise HTTPException(401)
-
-    user = security.get_current_user(token, db)
-    return user
 
 @router.get("/authenticate", tags = ["tests"])
-def token(user: User = Depends(get_current_user)):
+def token(user: User = Depends(dependencies.get_current_user)):
     return user
 
 @router.get("/get-all", response_model = userOutScheme, tags = ["tests"])
