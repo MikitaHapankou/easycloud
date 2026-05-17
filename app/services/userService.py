@@ -3,6 +3,7 @@ from .import security
 from datetime import datetime
 import os
 from app.config.security import BASE_DIR
+from fastapi import HTTPException
 
 def get_users(db):
     users = db.query(User).all()
@@ -26,10 +27,8 @@ def add_user(login: str, password: str, db):
     return new_user
 
 def auth_user(login: str, password: str, db):
-    try:
-        user = db.query(User).filter_by(login = login).first()
-        real_hash_string = user.password_hash
-        return security.check_password(password, real_hash_string)
+    user = db.query(User).filter_by(login = login).first()
 
-    except Exception as e:
-        raise e
+    if not user: raise HTTPException(status_code = 404, detail = "User doesn't exist")
+
+    return security.check_password(password, user.password_hash)

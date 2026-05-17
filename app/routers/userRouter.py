@@ -19,11 +19,7 @@ def add_user_route(user: userRequest, db: Session = Depends(dependencies.get_db)
         raise HTTPException(status_code = 500, detail = "Internal server error")
 @router.post("/login")
 def auth_user(response: Response, user: userRequest, db: Session = Depends(dependencies.get_db)):
-    try:
-        is_authenticated = userService.auth_user(user.login, user.password, db)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code = 500, detail = "Internal server error")
+    is_authenticated = userService.auth_user(user.login, user.password, db)
 
     if is_authenticated:
         payload = {"sub": user.login}
@@ -36,7 +32,8 @@ def auth_user(response: Response, user: userRequest, db: Session = Depends(depen
             path = "/"
         )
         return {"detail": "Success"}
-    else: raise HTTPException(status_code = 400, detail = "Wrong login or password")
+
+    else: raise HTTPException(status_code = 401, detail = "Invalid credentials")
 
 @router.get("/logout")
 def logout(response: Response):

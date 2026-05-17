@@ -30,7 +30,7 @@ def read_root(request: Request):
     )
 
 @app.get("/register", response_class = HTMLResponse)
-def read_root(request: Request):
+def read_register(request: Request):
     return templates.TemplateResponse(
         "register.html",
         {
