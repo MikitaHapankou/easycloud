@@ -18,9 +18,9 @@ app = FastAPI()
 app.include_router(userRouter.router)
 app.include_router(dashboardRouter.router)
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind = engine)
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class = HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse(
         "login.html",
@@ -29,7 +29,7 @@ def read_root(request: Request):
         }
     )
 
-@app.get("/register", response_class=HTMLResponse)
+@app.get("/register", response_class = HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse(
         "register.html",

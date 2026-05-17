@@ -25,28 +25,28 @@ def check_password(password: str, real_hash_string: str) -> bool:
         return True
     else: return False
 
-def create_token(data: dict):
+def create_token(data: dict) -> str:
     to_encode = data.copy()
     now = datetime.now(timezone.utc)
-    expires = now + timedelta(minutes=JWT_EXPIRE_MINUTES)
+    expires = now + timedelta(minutes = JWT_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expires, "nbf": now})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGO)
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm = JWT_ALGO)
 
     return encoded_jwt
 
 def get_current_user(token, db):
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+        payload = jwt.decode(token, JWT_SECRET, algorithms = [JWT_ALGO])
 
         login = str(payload.get("sub"))
         if not login:
-            raise HTTPException(status_code=401, detail="Invalid token")
+            raise HTTPException(status_code = 401, detail = "Invalid token")
 
-        user = db.query(User).filter_by(login=login).first()
+        user = db.query(User).filter_by(login = login).first()
 
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code = 404, detail = "User not found")
 
         return user
 
