@@ -1,7 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
 from typing import List, Tuple
-from app.models.user import User
 
 class userRequest(BaseModel):
     login: str

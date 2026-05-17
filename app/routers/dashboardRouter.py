@@ -1,13 +1,22 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, Cookie
 from app.config.templates import templates
-from app.services.security import get_current_user
+from app.services import security
 from app import dependencies
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 from app.config.security import BASE_DIR
 import os
-
+from app.models.user import User
+from app.schemas.dashboard import dashboardFileList
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
+
+def get_current_user(token: str = Cookie(""), db: Session = Depends(dependencies.get_db)):
+    if not token:
+        raise HTTPException(401)
+
+    user = security.get_current_user(token, db)
+
+    return user
 
 @router.get("/")
 def get_dashboard(request: Request):
@@ -19,31 +28,21 @@ def get_dashboard(request: Request):
         }
     )
 
-@router.get("/my")
-def get_files(token = Cookie(None), db: Session = Depends(dependencies.get_db)):
-    try:
-        print("Token: ", token)
-        user = get_current_user(token, db)
-        user_dir = os.path.join(BASE_DIR, user.login)
-        if not os.path.exists(user_dir):
-            os.makedirs(user_dir, exist_ok=True)
-            filenames = []
-        else:
-            filenames = os.listdir(user_dir)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400, detail="Wypierdalaj")
+@router.get("/my", response_model=dashboardFileList)
+def get_files(user: User = Depends(get_current_user)):
+    user_dir = os.path.join(BASE_DIR, user.login)
+    if not os.path.exists(user_dir):
+        os.makedirs(user_dir, exist_ok=True)
+        filenames = []
+    else:
+        filenames = os.listdir(user_dir)
 
-    resData = {"username": user.login, "files": filenames}
-    print(resData)
-    return resData
+    return {"username": user.login, "files": filenames}
 
 @router.get("/download/{file}")
-def get_dashboard(file: str, token = Cookie(None), db: Session = Depends(dependencies.get_db)):
-    try:
-        user = get_current_user(token, db)
-        file_path = os.path.join(BASE_DIR, user.login, file)
-        return FileResponse(file_path, filename=file)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400, detail="Wypierdalaj")
+def get_dashboard(file: str, user: User = Depends(get_current_user)):
+    file_path = os.path.join(BASE_DIR, user.login, file)
+    if not os.path.isfile(file_path):
+        raise HTTPException(status_code=404, detail="File doesn't exist")
+
+    return FileResponse(file_path, filename=file)
