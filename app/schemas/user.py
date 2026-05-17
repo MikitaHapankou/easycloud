@@ -10,7 +10,3 @@ class userORM(BaseModel):
 
     login: str
     password_hash: str
-
-class userOutScheme(BaseModel):
-    user_list: List[userORM]
-

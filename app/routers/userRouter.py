@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Response, Cookie
-from app.schemas.user import userRequest, userOutScheme
+from app.schemas.user import userRequest, userORM
 from app import dependencies
 from app.services import security
 from sqlalchemy.orm import Session
@@ -47,9 +47,9 @@ def logout(response: Response):
 def token(user: User = Depends(dependencies.get_current_user)):
     return user
 
-@router.get("/get-all", response_model = userOutScheme, tags = ["tests"])
+@router.get("/get-all", response_model = list[userORM], tags = ["tests"])
 def get_all_users(db: Session = Depends(dependencies.get_db)):
     try:
-        return {"user_list": userService.get_users(db)}
+        return userService.get_users(db)
     except Exception:
         raise HTTPException(status_code = 400, detail = "error")
