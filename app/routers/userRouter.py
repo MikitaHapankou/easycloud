@@ -18,14 +18,6 @@ def add_user_route(user: userRequest, db: Session = Depends(dependencies.get_db)
             raise HTTPException(status_code = 409, detail="User with this login already exists")
         else:
             raise HTTPException(status_code = 502, detail="Internal server error")
-
-@router.get("/get-all", response_model = userOutScheme)
-def get_all_users(db: Session = Depends(dependencies.get_db)):
-    try:
-        return {"user_list": userService.get_users(db)}
-    except Exception:
-        raise HTTPException(status_code = 400, detail="error")
-
 @router.post("/login")
 def auth_user(response: Response, user: userRequest, db: Session = Depends(dependencies.get_db)):
     try:
@@ -61,6 +53,13 @@ def get_current_user(token: str = Cookie(""), db: Session = Depends(dependencies
     user = security.get_current_user(token, db)
     return user
 
-@router.get("/authenticate")
+@router.get("/authenticate", tags=["tests"])
 def token(user: User = Depends(get_current_user)):
     return user
+
+@router.get("/get-all", response_model = userOutScheme, tags=["tests"])
+def get_all_users(db: Session = Depends(dependencies.get_db)):
+    try:
+        return {"user_list": userService.get_users(db)}
+    except Exception:
+        raise HTTPException(status_code = 400, detail="error")
