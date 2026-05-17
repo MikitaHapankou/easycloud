@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import os
 import jwt
 from app.models.user import User
+from fastapi import HTTPException
 
 JWT_EXPIRE_MINUTES = float(os.getenv("JWT_EXPIRE_MINUTES"))
 JWT_SECRET = os.getenv("JWT_SECRET")
@@ -37,8 +38,20 @@ def create_token(data: dict):
 def get_current_user(token, db):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+
         login = str(payload.get("sub"))
+        if not login:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
         user = db.query(User).filter_by(login=login).first()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
         return user
-    except Exception as e:
-        raise e
+
+    except jwt.exceptions.PyJWKClientError:
+        raise HTTPException(status_code = 503)
+
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code = 401, detail = "Invalid token")

@@ -1,15 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends, Response, Cookie
 from app.schemas.user import userRequest, userOutScheme
-from app.dependencies import get_db
-from app.services.security import create_token, get_current_user
+from app import dependencies
+from app.services import security
 from sqlalchemy.orm import Session
-from app.services.userService import add_user, get_users, auth
+from app.services import userService
+from app.models.user import User
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("/add")
-def add_user_route(user: userRequest, db: Session = Depends(get_db)):
+def add_user_route(user: userRequest, db: Session = Depends(dependencies.get_db)):
     try:
-        add_user(user.login, user.password, db)
+        userService.add_user(user.login, user.password, db)
         return {"detail": "Success"}
     except Exception as e:
         print(e)
@@ -19,23 +20,23 @@ def add_user_route(user: userRequest, db: Session = Depends(get_db)):
             raise HTTPException(status_code = 502, detail="Internal server error")
 
 @router.get("/get-all", response_model = userOutScheme)
-def get_all_users(db: Session = Depends(get_db)):
+def get_all_users(db: Session = Depends(dependencies.get_db)):
     try:
-        return {"user_list": get_users(db)}
+        return {"user_list": userService.get_users(db)}
     except Exception:
         raise HTTPException(status_code = 400, detail="error")
 
 @router.post("/login")
-def auth_user(response: Response, user: userRequest, db: Session = Depends(get_db)):
+def auth_user(response: Response, user: userRequest, db: Session = Depends(dependencies.get_db)):
     try:
-        is_authenticated = auth(user.login, user.password, db)
+        is_authenticated = userService.auth_user(user.login, user.password, db)
     except Exception as e:
         print(e)
         raise HTTPException(status_code = 500, detail="Internal server error")
 
     if is_authenticated:
         payload = {"sub": user.login}
-        token = create_token(payload)
+        token = security.create_token(payload)
         response.set_cookie(
             key="token",
             value=token,
@@ -46,19 +47,20 @@ def auth_user(response: Response, user: userRequest, db: Session = Depends(get_d
         return {"detail": "Success"}
     else: raise HTTPException(status_code = 400, detail="Wrong login or password")
 
-@router.get("/authenticate")
-def token(token: str =  Cookie(None), db: Session = Depends(get_db)):
-    try:
-        print(token)
-        user = get_current_user(token, db)
-        return user
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code = 400, detail="Wypierdalaj")
-
 @router.get("/logout")
 def logout(response: Response):
     response.delete_cookie(
         key="token",
-
     )
+
+### ENDPOINTS FOR TESTS SECTION
+def get_current_user(token: str = Cookie(""), db: Session = Depends(dependencies.get_db)):
+    if not token:
+        raise HTTPException(401)
+
+    user = security.get_current_user(token, db)
+    return user
+
+@router.get("/authenticate")
+def token(user: User = Depends(get_current_user)):
+    return user

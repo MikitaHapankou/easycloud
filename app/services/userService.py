@@ -21,7 +21,7 @@ def add_user(login: str, password: str, db):
     except Exception as e:
         raise e
 
-def auth(login: str, password: str, db):
+def auth_user(login: str, password: str, db):
     try:
         user = db.query(User).filter_by(login = login).first()
         real_hash_string = user.password_hash
