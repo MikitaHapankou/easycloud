@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, Cookie
+from fastapi import APIRouter, HTTPException, Depends, Request, File, UploadFile
+from typing import Annotated
 from app.config.templates import templates
 from fastapi.responses import FileResponse
 from app.config.security import BASE_DIR
@@ -6,6 +7,8 @@ import os
 from app.models.user import User
 from app.schemas.dashboard import dashboardFileList
 from app import dependencies
+from sqlalchemy.orm import Session
+import aiofiles
 router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 
 @router.get("/")
@@ -36,3 +39,13 @@ def get_dashboard(file: str, user: User = Depends(dependencies.get_current_user)
         raise HTTPException(status_code = 404, detail = "File doesn't exist")
 
     return FileResponse(file_path, filename = file)
+
+@router.post("/add")
+async def add_file(uploaded_file: UploadFile = File(...), user: User = Depends(dependencies.get_current_user)):
+    real_file_path = os.path.join(BASE_DIR, user.login, uploaded_file.filename)
+
+    async with aiofiles.open(real_file_path, 'wb') as real_file:
+        while chunk := await uploaded_file.read(1024 * 64):
+            await real_file.write(chunk)
+
+    return "Success"
