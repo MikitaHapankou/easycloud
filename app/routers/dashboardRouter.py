@@ -49,10 +49,11 @@ async def add_file(uploaded_file: UploadFile = File(...), user: User = Depends(d
 @router.get("/delete-file/{filename}")
 async def delete_file(filename: str, user: User = Depends(dependencies.get_current_user)):
     real_file_path = os.path.join(BASE_DIR, user.login, filename)
-    try:
-        await aiofiles.os.remove(real_file_path)
-    except FileNotFoundError:
-        raise HTTPException(status_code = 404, detail = "File not found")
+
+    isfile = await aiofiles.os.path.isfile(real_file_path)
+    if not isfile: raise HTTPException(status_code = 404, detail = "File not found")
+
+    await aiofiles.os.remove(real_file_path)
 
     return "Success"
 @router.get("/add-folder/{dirname}")
