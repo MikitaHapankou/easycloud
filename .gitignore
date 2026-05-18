@@ -3,3 +3,4 @@
 .idea/
 db/
 app/user_storage
+__pycache__/

@@ -13,10 +13,8 @@ router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 def get_dashboard(request: Request):
 
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
-        }
+        request = request,
+        name = "dashboard.html"
     )
 
 @router.get("/my", response_model = dashboardFileList)
@@ -38,7 +36,7 @@ def get_dashboard(file: str, user: User = Depends(dependencies.get_current_user)
 
     return FileResponse(file_path, filename = file)
 
-@router.post("/add")
+@router.post("/add-file")
 async def add_file(uploaded_file: UploadFile = File(...), user: User = Depends(dependencies.get_current_user)):
     real_file_path = os.path.join(BASE_DIR, user.login, uploaded_file.filename)
 
@@ -48,12 +46,21 @@ async def add_file(uploaded_file: UploadFile = File(...), user: User = Depends(d
 
     return "Success"
 
-@router.get("/delete/{filename}")
-async def delete_file(filename: str,  user: User = Depends(dependencies.get_current_user)):
+@router.get("/delete-file/{filename}")
+async def delete_file(filename: str, user: User = Depends(dependencies.get_current_user)):
     real_file_path = os.path.join(BASE_DIR, user.login, filename)
     try:
         await aiofiles.os.remove(real_file_path)
     except FileNotFoundError:
         raise HTTPException(status_code = 404, detail = "File not found")
+
+    return "Success"
+@router.get("/add-folder/{dirname}")
+async def add_directory(dirname: str, user: User = Depends(dependencies.get_current_user)):
+    dir_path = os.path.join(BASE_DIR, user.login, dirname)
+
+    if os.path.exists(dir_path): raise HTTPException(status_code = 404, detail = "Directory already exists")
+
+    await aiofiles.os.mkdir(dir_path)
 
     return "Success"

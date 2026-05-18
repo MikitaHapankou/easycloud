@@ -22,17 +22,13 @@ Base.metadata.create_all(bind = engine)
 @app.get("/", response_class = HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request
-        }
+        request = request,
+        name = "login.html"
     )
 
 @app.get("/register", response_class = HTMLResponse)
 def read_register(request: Request):
     return templates.TemplateResponse(
-        "register.html",
-        {
-            "request": request
-        }
+        request = request,
+        name = "register.html",
     )
