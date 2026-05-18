@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, File, UploadFile
-from typing import Annotated
 from app.config.templates import templates
 from fastapi.responses import FileResponse
 from app.config.security import BASE_DIR
@@ -7,8 +6,7 @@ import os
 from app.models.user import User
 from app.schemas.dashboard import dashboardFileList
 from app import dependencies
-from sqlalchemy.orm import Session
-import aiofiles
+import aiofiles, aiofiles.os
 router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 
 @router.get("/")
@@ -47,5 +45,15 @@ async def add_file(uploaded_file: UploadFile = File(...), user: User = Depends(d
     async with aiofiles.open(real_file_path, 'wb') as real_file:
         while chunk := await uploaded_file.read(1024 * 64):
             await real_file.write(chunk)
+
+    return "Success"
+
+@router.get("/delete/{filename}")
+async def delete_file(filename: str,  user: User = Depends(dependencies.get_current_user)):
+    real_file_path = os.path.join(BASE_DIR, user.login, filename)
+    try:
+        await aiofiles.os.remove(real_file_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code = 404, detail = "File not found")
 
     return "Success"
