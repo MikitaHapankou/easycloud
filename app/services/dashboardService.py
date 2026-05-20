@@ -36,3 +36,14 @@ async def add_new_file(uploaded_file: UploadFile = File(...), user: User = Depen
 
     except Exception:
         raise HTTPException(status_code = 500, detail = "Couldn't save file")
+
+async def delete_file(filename: str, user: User = Depends(dependencies.get_current_user)):
+    safe_filename = os.path.basename(filename)
+    real_file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
+
+    isfile = await aiofiles.os.path.isfile(real_file_path)
+    if not isfile: raise HTTPException(status_code=404, detail="File not found")
+
+    await aiofiles.os.remove(real_file_path)
+
+    return "Success"

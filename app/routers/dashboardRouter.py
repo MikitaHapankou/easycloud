@@ -29,15 +29,9 @@ async def add_file(result = Depends(dashboardService.add_new_file)):
     return result
 
 @router.get("/delete-file/{filename}")
-async def delete_file(filename: str, user: User = Depends(dependencies.get_current_user)):
-    real_file_path = os.path.join(config.BASE_DIR, user.login, filename)
+async def delete_file(result = Depends(dashboardService.delete_file)):
+    return result
 
-    isfile = await aiofiles.os.path.isfile(real_file_path)
-    if not isfile: raise HTTPException(status_code = 404, detail = "File not found")
-
-    await aiofiles.os.remove(real_file_path)
-
-    return "Success"
 @router.get("/add-folder/{dirname}")
 async def add_directory(dirname: str, user: User = Depends(dependencies.get_current_user)):
     dir_path = os.path.join(config.BASE_DIR, user.login, dirname)
