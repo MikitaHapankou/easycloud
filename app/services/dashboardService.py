@@ -15,8 +15,9 @@ def get_user_files(user: User = Depends(dependencies.get_current_user)):
 
     return {"username": user.login, "files": filenames}
 
-def get_file_path(file: str, user: User = Depends(dependencies.get_current_user)):
-    file_path = os.path.join(config.BASE_DIR, user.login, file)
+def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
+    safe_filename = os.path.basename(filename)
+    file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
 
     if not os.path.isfile(file_path):
         raise HTTPException(status_code = 404, detail = "File doesn't exist")
@@ -42,17 +43,21 @@ async def delete_file(filename: str, user: User = Depends(dependencies.get_curre
     real_file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
 
     isfile = await aiofiles.os.path.isfile(real_file_path)
-    if not isfile: raise HTTPException(status_code=404, detail="File not found")
+    if not isfile: raise HTTPException(status_code = 404, detail = "File not found")
 
     await aiofiles.os.remove(real_file_path)
 
     return "Success"
 
 async def add_directory(dirname: str, user: User = Depends(dependencies.get_current_user)):
-    dir_path = os.path.join(config.BASE_DIR, user.login, dirname)
+    dir_path = os.path.abspath(os.path.join(config.BASE_DIR, user.login))
+    new_dir_path = os.path.abspath(os.path.join(dir_path, dirname))
 
-    if os.path.exists(dir_path): raise HTTPException(status_code=404, detail="Directory already exists")
+    if not new_dir_path.startswith(dir_path):
+        raise HTTPException(status_code = 400, detail = "Invalid directory name")
 
-    await aiofiles.os.mkdir(dir_path)
+    if os.path.exists(new_dir_path): raise HTTPException(status_code = 404, detail = "Directory already exists")
+
+    await aiofiles.os.mkdir(new_dir_path)
 
     return "Success"
