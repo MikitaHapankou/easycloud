@@ -6,11 +6,11 @@ from app.models.user import User
 from app.schemas.dashboard import dashboardFileList
 from app import dependencies
 import aiofiles, aiofiles.os
+from app.services import dashboardService
 router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 
 @router.get("/")
 def get_dashboard(request: Request):
-
     return config.templates.TemplateResponse(
         request = request,
         name = "dashboard.html"
@@ -18,14 +18,7 @@ def get_dashboard(request: Request):
 
 @router.get("/my", response_model = dashboardFileList)
 def get_files(user: User = Depends(dependencies.get_current_user)):
-    user_dir = os.path.join(config.BASE_DIR, user.login)
-    if not os.path.exists(user_dir):
-        os.makedirs(user_dir, exist_ok = True)
-        filenames = []
-    else:
-        filenames = os.listdir(user_dir)
-
-    return {"username": user.login, "files": filenames}
+    return dashboardService.get_user_files(user)
 
 @router.get("/download/{file}")
 def get_dashboard(file: str, user: User = Depends(dependencies.get_current_user)):
