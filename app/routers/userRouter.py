@@ -42,7 +42,6 @@ def logout(response: Response):
     )
 
 ### ENDPOINTS FOR TESTS SECTION
-
 @router.get("/authenticate", tags = ["tests"])
 def token(user: User = Depends(dependencies.get_current_user)):
     return user

@@ -2,7 +2,8 @@ from app.models.user import User
 from .import security
 from datetime import datetime
 import os
-from app.config.security import BASE_DIR
+from app.config import config
+import aiofiles, aiofiles.os
 from fastapi import HTTPException
 
 def get_users(db):
@@ -21,7 +22,7 @@ def add_user(login: str, password: str, db):
         db.rollback()
         raise
 
-    dir_path = os.path.join(BASE_DIR, new_user.login)
+    dir_path = os.path.join(config.BASE_DIR, new_user.login)
     os.makedirs(dir_path, exist_ok = True)
 
     return new_user
