@@ -47,3 +47,12 @@ async def delete_file(filename: str, user: User = Depends(dependencies.get_curre
     await aiofiles.os.remove(real_file_path)
 
     return "Success"
+
+async def add_directory(dirname: str, user: User = Depends(dependencies.get_current_user)):
+    dir_path = os.path.join(config.BASE_DIR, user.login, dirname)
+
+    if os.path.exists(dir_path): raise HTTPException(status_code=404, detail="Directory already exists")
+
+    await aiofiles.os.mkdir(dir_path)
+
+    return "Success"
