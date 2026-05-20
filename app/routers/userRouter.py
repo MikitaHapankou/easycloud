@@ -5,18 +5,11 @@ from app.services import security
 from sqlalchemy.orm import Session
 from app.services import userService
 from app.models.user import User
-from sqlalchemy.exc import IntegrityError
 router = APIRouter(prefix = "/users", tags = ["users"])
 
 @router.post("/add")
-def add_user_route(user: userRequest, db: Session = Depends(dependencies.get_db)):
-    try:
-        userService.add_user(user.login, user.password, db)
-        return {"detail": "Success"}
-    except IntegrityError:
-        raise HTTPException(status_code = 409, detail = "User already exists")
-    except Exception:
-        raise HTTPException(status_code = 500, detail = "Internal server error")
+def add_user_route(result = Depends(userService.add_user)):
+    return result
 @router.post("/login")
 def auth_user(result = Depends(userService.auth_user)):
     return result
