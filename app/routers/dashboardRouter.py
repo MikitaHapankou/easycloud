@@ -17,8 +17,8 @@ def get_dashboard(request: Request):
     )
 
 @router.get("/my", response_model = dashboardFileList)
-def get_files(user: User = Depends(dependencies.get_current_user)):
-    return dashboardService.get_user_files(user)
+def get_files(user_files: dict = Depends(dashboardService.get_user_files)):
+    return user_files
 
 @router.get("/download/{file}")
 def get_dashboard(file: str, user: User = Depends(dependencies.get_current_user)):
