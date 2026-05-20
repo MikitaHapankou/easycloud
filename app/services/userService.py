@@ -4,7 +4,10 @@ from datetime import datetime
 import os
 from app.config import config
 import aiofiles, aiofiles.os
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends, Response
+from app.schemas.user import userRequest
+from app import dependencies
+from sqlalchemy.orm import Session
 
 def get_users(db):
     users = db.query(User).all()
@@ -27,9 +30,26 @@ def add_user(login: str, password: str, db):
 
     return new_user
 
-def auth_user(login: str, password: str, db):
+def auth_user(response: Response, user_data: userRequest, db: Session = Depends(dependencies.get_db)):
+    login: str = user_data.login
+    password: str = user_data.password
+
     user = db.query(User).filter_by(login = login).first()
 
     if not user: raise HTTPException(status_code = 404, detail = "User doesn't exist")
 
-    return security.check_password(password, user.password_hash)
+    is_authenticated = security.check_password(password, user.password_hash)
+
+    if is_authenticated:
+        payload = {"sub": user_data.login}
+        token = security.create_token(payload)
+        response.set_cookie(
+            key = "token",
+            value = token,
+            httponly = True,
+            samesite = "lax",
+            path = "/"
+        )
+        return {"detail": "Success"}
+
+    else: raise HTTPException(status_code = 401, detail = "Invalid credentials")
