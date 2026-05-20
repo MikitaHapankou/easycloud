@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 from fastapi.templating import Jinja2Templates
 
@@ -9,6 +9,8 @@ if not os.path.exists(BASE_DIR):
     os.makedirs(BASE_DIR, exist_ok = True)
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), ".env"))
+
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str

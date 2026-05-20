@@ -1,8 +1,3 @@
-#config
-from dotenv import load_dotenv
-
-load_dotenv()
-
 # Fastapi
 from fastapi import FastAPI, Request
 from app.routers import userRouter, dashboardRouter

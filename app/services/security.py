@@ -1,13 +1,13 @@
 import bcrypt
 from datetime import datetime, timedelta, timezone
-import os
+from app.config import config
 import jwt
 from app.models.user import User
 from fastapi import HTTPException
 
-JWT_EXPIRE_MINUTES = float(os.getenv("JWT_EXPIRE_MINUTES"))
-JWT_SECRET = os.getenv("JWT_SECRET")
-JWT_ALGO = os.getenv("JWT_ALGO")
+JWT_EXPIRE_MINUTES = config.settings.JWT_EXPIRE_MINUTES
+JWT_SECRET = config.settings.JWT_SECRET
+JWT_ALGO = config.settings.JWT_ALGO
 
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
