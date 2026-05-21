@@ -5,14 +5,25 @@ from fastapi import Depends, HTTPException, File, UploadFile
 from app import dependencies
 import aiofiles, aiofiles.os
 
+def get_files_recursive(dir):
+    files = []
+    for content in os.listdir(dir):
+        filepath = os.path.join(dir, content)
+        print(filepath)
+        files.append(content)
+        if not os.path.isfile(filepath):
+            files += get_files_recursive(filepath)
+
+    return files
+
 def get_user_files(user: User = Depends(dependencies.get_current_user)):
     user_dir = os.path.join(config.BASE_DIR, user.login)
     if not os.path.exists(user_dir):
         os.makedirs(user_dir, exist_ok = True)
         filenames = []
     else:
-        filenames = os.listdir(user_dir)
-
+        filenames = get_files_recursive(user_dir)
+    print(get_files_recursive(user_dir))
     return {"username": user.login, "files": filenames}
 
 def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
