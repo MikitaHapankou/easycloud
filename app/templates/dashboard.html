@@ -134,7 +134,45 @@
 
             min-height: 300px;
         }
+        .dir {
+            margin-left: 22px;
+            margin-top: 10px;
 
+            border-left: 2px solid #334155;
+
+            padding-left: 16px;
+        }
+
+        .dir-header {
+            display: flex;
+            align-items: center;
+
+            background: #1e293b;
+
+            color: #f8fafc;
+
+            padding: 12px 14px;
+
+            border-radius: 10px;
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+
+            transition: 0.2s;
+        }
+
+        .dir-header:hover {
+            background: #334155;
+        }
+
+        .dir-children {
+            margin-top: 8px;
+        }
+
+        .file-item {
+            margin-left: 12px;
+        }
         .file-item {
             display: flex;
             align-items: center;
@@ -234,14 +272,63 @@
 
         if (res.ok) {
             document.querySelector(".username").innerText = data.username;
-            let fileList = document.getElementById("filesContainer");
-            for (const filename of data.files) {
-                const a = document.createElement("a");
-                a.classList.add("file-item");
-                a.href = `/dashboard/download/${filename}`;
-                a.innerText = filename;
-                fileList.appendChild(a);
+
+            const itemMap = {};
+            const rootItems = [];
+
+            data.files.forEach(item => {
+               itemMap[item.id] = { ...item, children: [] };
+            });
+
+            data.files.forEach(item => {
+               const mappedItem = itemMap[item.id];
+
+               if (item["parent_id"] === "filesContainer"){
+                   rootItems.push(mappedItem);
+               }
+               else{
+                   const parent = itemMap[item["parent_id"]];
+                   if (parent) {
+                       parent.children.push(mappedItem);
+                   }
+               }
+            });
+
+            const renderTree = (nodes) => {
+                nodes.forEach(node => {
+                    let parentElement = document.getElementById(node["parent_id"]);
+
+                    if (node.type === 'dir'){
+                        const dir = document.createElement("div");
+                        dir.classList.add("dir");
+                        dir.id = node["id"];
+
+                        const dirHeader = document.createElement("div");
+                        dirHeader.classList.add("dir-header");
+                        dirHeader.innerText = node.name;
+                        const childrenContainer = document.createElement("div");
+                        childrenContainer.classList.add("dir-children");
+
+                        dir.appendChild(dirHeader);
+                        dir.appendChild(childrenContainer);
+
+                        parentElement.appendChild(dir);
+
+                        renderTree(node.children);
+                    }
+                    else {
+                        const a = document.createElement("a");
+                        a.classList.add("file-item");
+                        a.href = `/dashboard/download/${node["path"]}`;
+                        a.innerText = node["name"];
+
+                        parentElement.appendChild(a);
+                    }
+                })
             }
+
+            renderTree(rootItems);
+
         } else {
             window.location.href = "/";
         }
