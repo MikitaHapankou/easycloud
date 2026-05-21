@@ -16,9 +16,9 @@ def get_dashboard(request: Request):
 def get_files(user_files: dict = Depends(dashboardService.get_user_files)):
     return user_files
 
-@router.get("/download/{file}")
-def get_file(file: str, file_path: str = Depends(dashboardService.get_file_path)):
-    return FileResponse(file_path, filename = file)
+@router.get("/download/{filename:path}")
+def get_file(result: FileResponse = Depends(dashboardService.get_file_path)):
+    return result
 
 @router.post("/add-file")
 async def add_file(result = Depends(dashboardService.add_new_file)):

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 
 class dashboardFileList(BaseModel):
     username: str
-    files: List[str]
+    files: List[Dict[str, str]]

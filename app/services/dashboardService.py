@@ -2,27 +2,48 @@ import os
 from app.models.user import User
 from app.config import config
 from fastapi import Depends, HTTPException, File, UploadFile
+from fastapi.responses import FileResponse
 from app import dependencies
 import aiofiles, aiofiles.os
+import uuid
+
+def get_files_recursive(directory, parent_id: str, name = ""):
+    files = []
+    for content in os.listdir(directory):
+        filepath = os.path.join(directory, content)
+        path = name + content
+        content_dict = {"id": str(uuid.uuid4()), "name": content, "parent_id": parent_id, "type": "file", "path": path}
+
+        if not os.path.isfile(filepath):
+            content_dict["type"] = "dir"
+            files += get_files_recursive(filepath, content_dict["id"], path + "/")
+
+        files.append(content_dict)
+
+    return files
 
 def get_user_files(user: User = Depends(dependencies.get_current_user)):
     user_dir = os.path.join(config.BASE_DIR, user.login)
+
     if not os.path.exists(user_dir):
-        os.makedirs(user_dir, exist_ok = True)
         filenames = []
+        os.makedirs(user_dir, exist_ok = True)
     else:
-        filenames = os.listdir(user_dir)
+        filenames = get_files_recursive(user_dir, "filesContainer")
 
     return {"username": user.login, "files": filenames}
 
 def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
-    safe_filename = os.path.basename(filename)
-    file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
+    safe_path = os.path.join(config.BASE_DIR, user.login, filename)
+    file_path = os.path.abspath(safe_path)
+
+    if not file_path.startswith(config.BASE_DIR):
+        raise HTTPException(status_code = 400, detail = "Bad filename")
 
     if not os.path.isfile(file_path):
         raise HTTPException(status_code = 404, detail = "File doesn't exist")
 
-    return file_path
+    return FileResponse(file_path, filename = os.path.basename(filename))
 
 async def add_new_file(uploaded_file: UploadFile = File(...), user: User = Depends(dependencies.get_current_user)):
     safe_filename = os.path.basename(uploaded_file.filename)
