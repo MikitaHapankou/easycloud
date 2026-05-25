@@ -7,6 +7,7 @@ class User(Base):
 
     id = Column(Integer, primary_key = True)
     login = Column(String(20), nullable = False, unique = True)
+    role = Column(String(10), nullable = False)
     password_hash = Column(String(60), nullable = False)
     created_at = Column(TIMESTAMP(timezone = True))
 

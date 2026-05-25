@@ -20,7 +20,7 @@ def add_user(user_data: userRequest, db: Session = Depends(dependencies.get_db))
     try:
         password_hash = security.hash_password(password)
         now = datetime.now()
-        new_user = User(login = login, password_hash = password_hash, created_at = now)
+        new_user = User(login = login, password_hash = password_hash, role = config.Role.USER.name, created_at = now)
         db.add(new_user)
 
         try:
@@ -51,7 +51,7 @@ def auth_user(response: Response, user_data: userRequest, db: Session = Depends(
     is_authenticated = security.check_password(password, user.password_hash)
 
     if is_authenticated:
-        payload = {"sub": user_data.login}
+        payload = {"sub": user_data.login, "role": user.role}
         token = security.create_token(payload)
         response.set_cookie(
             key = "token",

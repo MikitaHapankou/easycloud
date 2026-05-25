@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 from fastapi.templating import Jinja2Templates
+from enum import Enum
 
 templates = Jinja2Templates(directory = "app/templates")
 
@@ -23,3 +24,7 @@ class Settings(BaseSettings):
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@localhost:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()
+
+class Role(Enum):
+    ADMIN = 1
+    USER = 2

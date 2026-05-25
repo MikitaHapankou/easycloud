@@ -11,31 +11,40 @@ def get_files_recursive(directory, parent_id: str, name = ""):
     files = []
     for content in os.listdir(directory):
         filepath = os.path.join(directory, content)
-        path = name + content
+        if name: path = name + "/" + content
+        else: path = content
         content_dict = {"id": str(uuid.uuid4()), "name": content, "parent_id": parent_id, "type": "file", "path": path}
 
         if not os.path.isfile(filepath):
             content_dict["type"] = "dir"
-            files += get_files_recursive(filepath, content_dict["id"], path + "/")
+            files += get_files_recursive(filepath, content_dict["id"], path)
 
         files.append(content_dict)
 
     return files
 
 def get_user_files(user: User = Depends(dependencies.get_current_user)):
-    user_dir = os.path.join(config.BASE_DIR, user.login)
+    if user.role == config.Role.USER.name:
+        user_dir = os.path.join(config.BASE_DIR, user.login)
 
-    if not os.path.exists(user_dir):
-        filenames = []
-        os.makedirs(user_dir, exist_ok = True)
+        if not os.path.exists(user_dir):
+            filenames = []
+            os.makedirs(user_dir, exist_ok = True)
+        else:
+            filenames = get_files_recursive(user_dir, "filesContainer", user.login)
     else:
+        user_dir = config.BASE_DIR
         filenames = get_files_recursive(user_dir, "filesContainer")
 
     return {"username": user.login, "files": filenames}
 
 def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
-    safe_path = os.path.join(config.BASE_DIR, user.login, filename)
+    safe_path = os.path.join(config.BASE_DIR, filename)
     file_path = os.path.abspath(safe_path)
+
+    if user.role != config.Role.ADMIN.name:
+        if not file_path.startswith(os.path.join(config.BASE_DIR, user.login)):
+            raise HTTPException(status_code=400, detail="Bad filename")
 
     if not file_path.startswith(config.BASE_DIR):
         raise HTTPException(status_code = 400, detail = "Bad filename")
