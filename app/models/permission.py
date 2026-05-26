@@ -5,19 +5,18 @@ from sqlalchemy.sql import func
 from app.db.database import Base
 from app.models.acl import acl_records
 
-class User(Base):
-    __tablename__ = "users"
+class Permission(Base):
+    __tablename__ = "permissions"
 
     id = Column(Integer, primary_key=True)
-    login = Column(String(20), nullable=False, unique=True)
-    password_hash = Column(String(60), nullable=False)
+    dirname = Column(String(100), nullable=False, unique=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    shared_directories = relationship(
-        "Permission",
+    authorized_users = relationship(
+        "User",
         secondary=acl_records,
-        back_populates="authorized_users"
+        back_populates="shared_directories"
     )
 
     def __repr__(self):
-        return f"<User(login='{self.login}')>"
+        return f"<Permission(dirname='{self.dirname}')>"
