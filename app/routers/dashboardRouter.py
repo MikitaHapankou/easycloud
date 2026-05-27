@@ -24,7 +24,7 @@ def get_file(result: FileResponse = Depends(dashboardService.get_file_path)):
 async def add_file(result = Depends(dashboardService.add_new_file)):
     return result
 
-@router.get("/delete-file/{filename}")
+@router.get("/delete-file/{filename:path}")
 async def delete_file(result = Depends(dashboardService.delete_file)):
     return result
 

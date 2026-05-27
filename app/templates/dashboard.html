@@ -338,13 +338,15 @@
                         renderTree(node.children);
                     }
                     else {
+                        const fileDiv = document.createElement("div");
+
                         const deleteBtn = document.createElement("button");
                         deleteBtn.innerText = "Delete";
                         deleteBtn.classList.add("delete-btn");
 
                         deleteBtn.onclick = async () => {
                             try{
-                                const response = await fetch (`/dashboard/delete-file/${node.name}`,{
+                                const response = await fetch (`/dashboard/delete-file/${node.path}`,{
                                     method: "GET"
                                 })
 
@@ -366,9 +368,11 @@
                         a.classList.add("file-item");
                         a.href = `/dashboard/download/${node["path"]}`;
                         a.innerText = node["name"];
-                        a.appendChild(deleteBtn);
 
-                        parentElement.appendChild(a);
+                        fileDiv.appendChild(a);
+                        fileDiv.appendChild(deleteBtn);
+
+                        parentElement.appendChild(fileDiv);
 
                     }
                 })
