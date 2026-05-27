@@ -59,14 +59,22 @@ async def add_new_file(uploaded_file: UploadFile = File(...), user: User = Depen
     real_file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
 
     try:
+        if await aiofiles.os.path.exists(real_file_path):
+            raise HTTPException(status_code=404, detail="File already exists")
+
+        if uploaded_file.size > 500 * (10 ** 6):
+            raise HTTPException(status_code=400, detail="File is too big")
+
         async with aiofiles.open(real_file_path, 'wb') as real_file:
             while chunk := await uploaded_file.read(1024 * 64):
                 await real_file.write(chunk)
 
         return "Success"
 
+    except HTTPException as e:
+        raise e
     except Exception:
-        raise HTTPException(status_code = 500, detail = "Couldn't save file")
+        raise HTTPException(status_code=500, detail="Couldn't save file")
 
 async def delete_file(filename: str, user: User = Depends(dependencies.get_current_user)):
     safe_filename = os.path.basename(filename)
