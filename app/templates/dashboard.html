@@ -71,6 +71,23 @@
             background: #dc2626;
         }
 
+        .delete-btn {
+            padding: 6px 12px;
+            background: #df1948;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-left: 15px;
+        }
+
+        .delete-btn:hover {
+            background: #da5374;
+        }
+
         .dashboard-wrapper {
             display: flex;
             justify-content: center;
@@ -321,12 +338,38 @@
                         renderTree(node.children);
                     }
                     else {
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.innerText = "Delete";
+                        deleteBtn.classList.add("delete-btn");
+
+                        deleteBtn.onclick = async () => {
+                            try{
+                                const response = await fetch (`/dashboard/delete-file/${node.name}`,{
+                                    method: "GET"
+                                })
+
+                                const result = await response.json();
+
+                                if (response.ok) {
+                                        alert("Success");
+                                        window.location.reload();
+                                    } else {
+                                        alert("Error: " + result.detail);
+                                    }
+                            }
+                            catch (error){
+                                alert("An error occured");
+                            }
+                        };
+
                         const a = document.createElement("a");
                         a.classList.add("file-item");
                         a.href = `/dashboard/download/${node["path"]}`;
                         a.innerText = node["name"];
+                        a.appendChild(deleteBtn);
 
                         parentElement.appendChild(a);
+
                     }
                 })
             }
