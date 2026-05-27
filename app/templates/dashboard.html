@@ -120,6 +120,9 @@
 
             transition: 0.2s;
         }
+        .upload-btn input {
+            display: none;
+        }
 
         .upload-btn:hover {
             background: #2563eb;
@@ -228,9 +231,10 @@
 
             <h1>My Files</h1>
 
-            <button class="upload-btn">
-                Upload File
-            </button>
+            <div class="upload-btn">
+                <label for="input">Upload file</label>
+                <input type="file" id="input" multiple />
+            </div>
 
         </div>
 
@@ -332,7 +336,36 @@
         } else {
             window.location.href = "/";
         }
+        const inputElement = document.getElementById("input");
+        inputElement.addEventListener("change", handleFiles);
+        async function handleFiles() {
+            const fileList = this.files;
+            const file = fileList[0];
+            if (file){
+                try {
+                    const formData = new FormData();
+                    formData.append('uploaded_file', file);
+                    const response = await fetch(`/dashboard/add-file`, {
+                        method: "POST",
+                        body: formData
+                    });
 
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert("Success");
+                        window.location.reload();
+                    } else {
+                        alert("Error: " + result.detail);
+                    }
+
+                }
+                catch (error){
+                    alert("An error occured");
+                }
+
+            }
+        }
     });
 </script>
 
