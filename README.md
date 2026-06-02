@@ -1,4 +1,4 @@
-# Dokumentacja Projektu easycloud (Klon Dropbox)
+# Dokumentacja Projektu easycloud
 **Przedmiot:** Wprowadzenie do cyberbezpieczeństwa - projekty  
 **Temat projektu:** Temat 17 - Autoryzacja w aplikacjach webowych  
 
