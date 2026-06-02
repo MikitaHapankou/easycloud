@@ -6,6 +6,52 @@ from fastapi.responses import FileResponse
 from app import dependencies
 import aiofiles, aiofiles.os
 import uuid
+from sqlalchemy.orm import Session
+from sqlalchemy import insert
+from sqlalchemy.exc import IntegrityError
+from app.models.permission import Permission
+from app.models.acl import acl_records
+
+def share_directory(dirname: str, target_login: str, action: str = "read", db: Session = Depends(dependencies.get_db), current_user: User = Depends(dependencies.get_current_user)):
+    target_user = db.query(User).filter_by(login=target_login).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if target_user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Can't share to yourself")
+
+    user_dir_path = os.path.abspath(os.path.join(config.BASE_DIR, current_user.login))
+    target_dir_path = os.path.abspath(os.path.join(config.BASE_DIR, dirname))
+
+    if not target_dir_path.startswith(user_dir_path):
+        raise HTTPException(status_code=400, detail="Invalid user")
+
+    if not os.path.exists(target_dir_path):
+        raise HTTPException(status_code=404, detail="File or directory does not exist on disk")
+
+    unique_dirname = f"{current_user.login}/{dirname}"
+
+    permission = db.query(Permission).filter_by(dirname=unique_dirname).first()
+    if not permission:
+        permission = Permission(dirname=unique_dirname)
+        db.add(permission)
+        db.commit()
+        db.refresh(permission)
+
+    try:
+        stmt = insert(acl_records).values(
+            user_id=target_user.id,
+            permission_id=permission.id,
+            action=action
+        )
+        db.execute(stmt)
+        db.commit()
+        return {"detail": f"Access to folder '{dirname}' successfully granted to {target_login}"}
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="This user already has access to this folder")
+
 
 def get_files_recursive(directory, parent_id: str, name = ""):
     files = []
@@ -23,7 +69,7 @@ def get_files_recursive(directory, parent_id: str, name = ""):
 
     return files
 
-def get_user_files(user: User = Depends(dependencies.get_current_user)):
+def get_user_files(db: Session = Depends(dependencies.get_db), user: User = Depends(dependencies.get_current_user)):
     if user.role == config.Role.USER.name:
         user_dir = os.path.join(config.BASE_DIR, user.login)
 
@@ -32,10 +78,45 @@ def get_user_files(user: User = Depends(dependencies.get_current_user)):
             os.makedirs(user_dir, exist_ok = True)
         else:
             filenames = get_files_recursive(user_dir, "filesContainer", user.login)
+
+        shared_permissions = db.query(Permission).join(acl_records).filter(
+            acl_records.c.user_id == user.id,
+            acl_records.c.action == "read"
+        ).all()
+
+        for perm in shared_permissions:
+            phys_path = os.path.join(config.BASE_DIR, perm.dirname)
+
+            if os.path.exists(phys_path):
+                parts = perm.dirname.strip('/').split('/')
+                owner_login = parts[0]
+                resource_name = parts[-1]
+
+                shared_id = f"shared_{perm.id}"
+
+                if os.path.isdir(phys_path):
+                    filenames.append({
+                        "id": shared_id,
+                        "name": f"shared {resource_name} (from {owner_login})",
+                        "parent_id": "filesContainer",
+                        "type": "dir",
+                        "path": perm.dirname + "/"
+                    })
+                    shared_files = get_files_recursive(phys_path, shared_id, perm.dirname + "/")
+                    filenames += shared_files
+                elif os.path.isfile(phys_path):
+                    filenames.append({
+                        "id": shared_id,
+                        "name": f"shared {resource_name} (from {owner_login})",
+                        "parent_id": "filesContainer",
+                        "type": "file",
+                        "path": perm.dirname
+                    })
     else:
         user_dir = config.BASE_DIR
         filenames = get_files_recursive(user_dir, "filesContainer")
 
+    print(filenames)
     return {"username": user.login, "files": filenames}
 
 def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
@@ -81,7 +162,7 @@ async def delete_file(filename: str, user: User = Depends(dependencies.get_curre
     real_file_path = os.path.abspath(file_path)
 
     user_path = os.path.join(config.BASE_DIR, user.login)
-    if not real_file_path.startswith(user_path):
+    if not real_file_path.startswith(user_path) and user.role != "ADMIN":
         raise HTTPException(status_code = 400, detail = "Invalid filename")
 
     isfile = await aiofiles.os.path.isfile(real_file_path)

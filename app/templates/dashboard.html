@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mhcloud Dashboard</title>
+    <title>easycloud Dashboard</title>
 
     <style>
         * {
@@ -14,205 +14,197 @@
 
         body {
             min-height: 100vh;
-            background: #0f172a;
-            font-family: Arial, sans-serif;
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1e1e20;
         }
 
         .topbar {
             width: 100%;
-            height: 70px;
-
-            background: #1e293b;
-
+            height: 64px;
+            background: #ffffff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-
-            padding: 0 40px;
-
-            border-bottom: 1px solid #334155;
+            padding: 0 32px;
+            border-bottom: 1px solid #e5e8eb;
         }
 
         .logo {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+            color: #0061fe;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 20px;
         }
 
         .username {
-            color: #cbd5e1;
-            font-size: 15px;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .logout-btn {
-            padding: 10px 16px;
-
-            border: none;
-            border-radius: 10px;
-
-            background: #ef4444;
-            color: white;
-
-            font-size: 14px;
-            font-weight: bold;
-
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1e1e20;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
 
         .logout-btn:hover {
-            background: #dc2626;
+            background: #f9fafb;
+            border-color: #9ca3af;
         }
 
         .delete-btn {
             padding: 6px 12px;
-            background: #df1948;
-            border: none;
-            border-radius: 6px;
-            color: white;
+            background: #ffffff;
+            border: 1px solid #ef4444;
+            border-radius: 4px;
+            color: #ef4444;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
-            margin-left: 15px;
+            transition: 0.2s ease;
+            margin-left: 8px;
         }
 
         .delete-btn:hover {
-            background: #da5374;
+            background: #fef2f2;
+        }
+
+        .share-btn {
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            color: #1e1e20;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s ease;
+            margin-left: auto;
+        }
+
+        .share-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
         }
 
         .dashboard-wrapper {
             display: flex;
             justify-content: center;
-
-            padding: 50px 20px;
+            padding: 40px 24px;
         }
 
         .dashboard-card {
-            width: 800px;
-
-            background: #1e293b;
-
-            border-radius: 18px;
-
-            padding: 40px;
-
-            box-shadow:
-                0 10px 25px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1000px;
+            background: #ffffff;
+            padding: 0;
         }
 
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-
-            margin-bottom: 30px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e8eb;
         }
 
         .dashboard-header h1 {
-            color: white;
-            font-size: 32px;
+            color: #1e1e20;
+            font-size: 24px;
+            font-weight: 600;
         }
 
         .upload-btn {
-            padding: 12px 18px;
-
+            padding: 10px 16px;
             border: none;
-            border-radius: 10px;
-
-            background: #3b82f6;
-            color: white;
-
-            font-size: 15px;
-            font-weight: bold;
-
+            border-radius: 6px;
+            background: #0061fe;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
+
         .upload-btn input {
             display: none;
         }
 
         .upload-btn:hover {
-            background: #2563eb;
+            background: #0050d1;
         }
 
         .files-container {
-            background: #0f172a;
-
-            border-radius: 16px;
-
-            padding: 20px;
-
+            background: #ffffff;
             min-height: 300px;
         }
+
         .dir {
-            margin-left: 22px;
-            margin-top: 10px;
-
-            border-left: 2px solid #334155;
-
-            padding-left: 16px;
+            margin-left: 20px;
+            margin-top: 4px;
+            border-left: 1px solid #e5e8eb;
+            padding-left: 12px;
         }
 
         .dir-header {
             display: flex;
             align-items: center;
-
-            background: #1e293b;
-
-            color: #f8fafc;
-
-            padding: 12px 14px;
-
-            border-radius: 10px;
-
-            font-weight: bold;
-
-            margin-bottom: 10px;
-
-            transition: 0.2s;
+            background: #ffffff;
+            color: #1e1e20;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            transition: 0.2s ease;
+            cursor: pointer;
         }
 
         .dir-header:hover {
-            background: #334155;
+            background: #f7f9fa;
         }
 
         .dir-children {
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
-        .file-item {
-            margin-left: 12px;
+        .file-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            margin-bottom: 2px;
+            border-radius: 6px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: 0.2s ease;
         }
+
+        .file-wrapper:hover {
+            background: #f7f9fa;
+        }
+
         .file-item {
             display: flex;
             align-items: center;
-
-            padding: 16px;
-
-            margin-bottom: 14px;
-
-            background: #334155;
-
-            border-radius: 12px;
-
-            color: white;
+            flex-grow: 1;
+            background: transparent;
+            color: #1e1e20;
             text-decoration: none;
-
-            transition: 0.2s;
-        }
-
-        .file-item:hover {
-            background: #475569;
+            font-size: 14px;
         }
 
     </style>
@@ -220,64 +212,33 @@
 <body>
 
 <div class="topbar">
-
     <div class="logo">
-        mhcloud
+        easycloud
     </div>
-
     <div class="topbar-right">
-
         <div class="username">
             Username
         </div>
-
         <button class="logout-btn" type="button" id="logout-btn">
             Logout
         </button>
-
     </div>
-
 </div>
-
 
 <div class="dashboard-wrapper">
-
     <div class="dashboard-card">
-
         <div class="dashboard-header">
-
             <h1>My Files</h1>
-
             <div class="upload-btn">
-                <label for="input">Upload file</label>
+                <label for="input" style="cursor:pointer;">Upload file</label>
                 <input type="file" id="input" multiple />
             </div>
-
         </div>
-
         <div class="files-container" id="filesContainer">
-
-            <!-- FILES WILL BE INSERTED HERE -->
-
-            <!-- Example -->
-            <!--
-            <a href="#" class="file-item">
-                photo.png
-            </a>
-            -->
-
-            <!-- Empty state -->
-            <!--
-            <div class="empty-text">
-                No files uploaded yet
-            </div>
-            -->
-
         </div>
-
     </div>
-
 </div>
+
 <script>
     document.getElementById("logout-btn").addEventListener("click", () => {
         fetch ("/users/logout");
@@ -327,6 +288,7 @@
                         const dirHeader = document.createElement("div");
                         dirHeader.classList.add("dir-header");
                         dirHeader.innerText = node.name;
+
                         const childrenContainer = document.createElement("div");
                         childrenContainer.classList.add("dir-children");
 
@@ -338,7 +300,39 @@
                         renderTree(node.children);
                     }
                     else {
-                        const fileDiv = document.createElement("div");
+                        const fileWrapper = document.createElement("div");
+                        fileWrapper.classList.add("file-wrapper");
+
+                        const a = document.createElement("a");
+                        a.classList.add("file-item");
+                        a.href = `/dashboard/download/${node["path"]}`;
+                        a.innerText = node["name"];
+
+                        const shareBtn = document.createElement("button");
+                        shareBtn.innerText = "Share";
+                        shareBtn.classList.add("share-btn");
+
+                        shareBtn.onclick = async () => {
+                            const targetLogin = prompt(`Sharing folder '${node.name}'.\nType in user login you want to share with:`);
+
+                            if (targetLogin) {
+                                try {
+                                    const response = await fetch(`/dashboard/share?dirname=${node.path}&target_login=${targetLogin}&action=read`, {
+                                        method: "POST"
+                                    });
+
+                                    const result = await response.json();
+
+                                    if (response.ok) {
+                                        alert("Success " + result.detail);
+                                    } else {
+                                        alert("Error: " + result.detail);
+                                    }
+                                } catch (error) {
+                                    alert("An error occured");
+                                }
+                            }
+                        };
 
                         const deleteBtn = document.createElement("button");
                         deleteBtn.innerText = "Delete";
@@ -364,16 +358,11 @@
                             }
                         };
 
-                        const a = document.createElement("a");
-                        a.classList.add("file-item");
-                        a.href = `/dashboard/download/${node["path"]}`;
-                        a.innerText = node["name"];
+                        fileWrapper.appendChild(a);
+                        fileWrapper.appendChild(shareBtn);
+                        fileWrapper.appendChild(deleteBtn);
 
-                        fileDiv.appendChild(a);
-                        fileDiv.appendChild(deleteBtn);
-
-                        parentElement.appendChild(fileDiv);
-
+                        parentElement.appendChild(fileWrapper);
                     }
                 })
             }
@@ -383,8 +372,10 @@
         } else {
             window.location.href = "/";
         }
+
         const inputElement = document.getElementById("input");
         inputElement.addEventListener("change", handleFiles);
+
         async function handleFiles() {
             const fileList = this.files;
             const file = fileList[0];
