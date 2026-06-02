@@ -155,10 +155,6 @@
         }
 
         .dir {
-            margin-left: 20px;
-            margin-top: 4px;
-            border-left: 1px solid #e5e8eb;
-            padding-left: 12px;
         }
 
         .dir-header {
@@ -180,7 +176,14 @@
         }
 
         .dir-children {
+            margin-left: 20px;
             margin-top: 4px;
+            border-left: 1px solid #e5e8eb;
+            padding-left: 12px;
+        }
+
+        .dir-children:empty {
+            display: none;
         }
 
         .file-wrapper {
@@ -279,6 +282,10 @@
             const renderTree = (nodes) => {
                 nodes.forEach(node => {
                     let parentElement = document.getElementById(node["parent_id"]);
+
+                    if (parentElement && parentElement.classList.contains("dir")) {
+                        parentElement = parentElement.querySelector(".dir-children");
+                    }
 
                     if (node.type === 'dir'){
                         const dir = document.createElement("div");

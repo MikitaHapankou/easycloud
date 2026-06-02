@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
+    DATABASE_HOST: str
     POSTGRES_DB: str
     POSTGRES_PORT: int
     JWT_SECRET: str
@@ -21,7 +22,7 @@ class Settings(BaseSettings):
     JWT_ALGO: str
 
     def get_db_url(self):
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@localhost:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.DATABASE_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()
 
