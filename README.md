@@ -38,7 +38,7 @@ Aplikacja realizuje uwierzytelnianie oraz 2 różne mechanizmy autoryzacji użyt
 ## 3. Część techniczna i architektura bezpieczeństwa
 Architektura systemu opiera się na bezpiecznym oddzieleniu warstwy przechowywania plików od warstwy zarządzania uprawnieniami. Fizyczne pliki użytkowników nie są przechowywane w bazie danych lub supabase storage, lecz w dedykowanym na serwerze katalogu `user_storage`. Dostęp do zasobów na dysku jest w pełni nadzorowany przez backend, co uniemożliwia bezpośrednie i nieautoryzowane pobranie pliku z zewnątrz.
 
-### 3.1. Uwierzytelnianie (Authentication)
+### 3.1. Uwierzytelnianie
 Aplikacja wykorzystuje bezstanowy mechanizm uwierzytelniania oparty na tokenach JWT (JSON Web Token).
 Po pomyślnym logowaniu serwer generuje token (podpisywany bezpiecznym algorytmem szyfrowania symetrycznego HS256 z użyciem sekretnego klucza przechowywanego w zmiennych środowiskowych).
 Token jest przekazywany do klienta za pomocą nagłówka `Set-Cookie` jako ciasteczko `HttpOnly`. Dzięki temu klient automatycznie i w sposób transparentny dołącza token do każdego kolejnego zapytania.
@@ -63,7 +63,7 @@ Signature:
 IFE7gEeOk4jbOpYi8P79TSCZjFDuRsIKxlffEv72ifk
 ```
 
-### 3.2. Autoryzacja i Kontrola Dostępu (Authorization)
+### 3.2. Autoryzacja i Kontrola Dostępu
 Zgodnie z wymogami projektu, w aplikacji zaimplementowano i zintegrowano dwie niezależne metody kontroli dostępu, co pozwala na elastyczne zarządzanie uprawnieniami:
 
 #### A. Role-Based Access Control (RBAC)
