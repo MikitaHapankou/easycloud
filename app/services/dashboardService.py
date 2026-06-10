@@ -29,7 +29,7 @@ def share_directory(dirname: str, target_login: str, action: str = "read", db: S
     if not os.path.exists(target_dir_path):
         raise HTTPException(status_code=404, detail="File or directory does not exist on disk")
 
-    unique_dirname = f"{current_user.login}/{dirname}"
+    unique_dirname = dirname
 
     permission = db.query(Permission).filter_by(dirname=unique_dirname).first()
     if not permission:
