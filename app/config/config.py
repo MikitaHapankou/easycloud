@@ -1,11 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
-from fastapi.templating import Jinja2Templates
 from enum import Enum
 
-templates = Jinja2Templates(directory = "app/templates")
-
 BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_storage")
+TEMPLATE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 if not os.path.exists(BASE_DIR):
     os.makedirs(BASE_DIR, exist_ok = True)
 
