@@ -3,7 +3,7 @@ import os
 from enum import Enum
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_storage")
-TEMPLATE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates")
 
 if not os.path.exists(BASE_DIR):
     os.makedirs(BASE_DIR, exist_ok = True)

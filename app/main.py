@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Request
 from app.routers import userRouter, dashboardRouter
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 #Database
 from app.db.database import Base, engine
@@ -11,6 +12,7 @@ from app.config import config
 import os
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="app/templates"), name="static")
 app.include_router(userRouter.router)
 app.include_router(dashboardRouter.router)
 

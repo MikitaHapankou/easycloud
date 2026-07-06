@@ -3,16 +3,12 @@ from app.config import config
 from fastapi.responses import FileResponse
 from app.schemas.dashboard import dashboardFileList
 from app.services import dashboardService
-
+import os
 router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 
 @router.get("/")
 def get_dashboard(request: Request):
-    return config.templates.TemplateResponse(
-        request = request,
-        name = "dashboard.html"
-    )
-
+    return FileResponse(path = os.path.join(config.TEMPLATE_DIR, "dashboard.html"))
 @router.get("/download/{filename:path}")
 def get_file(result = Depends(dashboardService.get_file_path)):
     return result
