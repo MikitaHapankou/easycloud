@@ -1,65 +1,43 @@
-from app.models.user import User
-from .import security
-from datetime import datetime
 import os
 from app.config import config
-import aiofiles, aiofiles.os
-from fastapi import HTTPException, Depends, Response
+from app.config.error_codes import AUTH_ERROR_MAP
+from fastapi import HTTPException
 from app.schemas.user import userRequest
-from app import dependencies
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from app.dependencies import raise_auth_error
+from supabase import AuthApiError
 
-def get_users(db):
-    users = db.query(User).all()
-    return users
-
-def add_user(user_data: userRequest, db: Session = Depends(dependencies.get_db)):
+def add_user(user_data: userRequest):
     login = user_data.login
     password = user_data.password
     try:
-        password_hash = security.hash_password(password)
-        now = datetime.now()
-        new_user = User(login = login, password_hash = password_hash, role = config.Role.USER.name, created_at = now)
-        db.add(new_user)
+        response = config.supabase.auth.sign_up(
+            {
+                "email": login,
+                "password": password,
+            }
+        )
 
-        try:
-            db.commit()
-        except Exception:
-            db.rollback()
-            raise
-
-        dir_path = os.path.join(config.BASE_DIR, new_user.login)
+        dir_path = os.path.join(config.BASE_DIR, login)
         os.makedirs(dir_path, exist_ok = True)
 
-        return "Success"
+    except AuthApiError as auth_error:
+        raise_auth_error(auth_error)
 
-    except IntegrityError:
-        raise HTTPException(status_code=409, detail="User already exists")
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = "Internal server error")
 
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-def auth_user(response: Response, user_data: userRequest, db: Session = Depends(dependencies.get_db)):
+def auth_user(user_data: userRequest):
     login: str = user_data.login
     password: str = user_data.password
-
-    user = db.query(User).filter_by(login = login).first()
-
-    if not user: raise HTTPException(status_code = 404, detail = "User doesn't exist")
-
-    is_authenticated = security.check_password(password, user.password_hash)
-
-    if is_authenticated:
-        payload = {"sub": user_data.login, "role": user.role}
-        token = security.create_token(payload)
-        response.set_cookie(
-            key = "token",
-            value = token,
-            httponly = True,
-            samesite = "lax",
-            path = "/"
+    try:
+        response = config.supabase.auth.sign_in_with_password(
+            {
+                "email": login,
+                "password": password,
+            }
         )
-        return {"detail": "Success"}
+    except AuthApiError as auth_error:
+        raise_auth_error(auth_error)
 
-    else: raise HTTPException(status_code = 401, detail = "Invalid credentials")
+    except Exception as e:
+        raise HTTPException(status_code = 500, detail = "Internal server error")

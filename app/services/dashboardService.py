@@ -69,55 +69,16 @@ def get_files_recursive(directory, parent_id: str, name = ""):
 
     return files
 
-def get_user_files(db: Session = Depends(dependencies.get_db), user: User = Depends(dependencies.get_current_user)):
-    if user.role == config.Role.USER.name:
-        user_dir = os.path.join(config.BASE_DIR, user.login)
+def get_user_files():
+    session = config.supabase.auth.get_session()
+    token = session.access_token
+    response = config.supabase.auth.get_claims(jwt = token)
+    claims_dict = response["claims"]
+    login = claims_dict["email"]
+    user_dir = os.path.join(config.BASE_DIR, login)
+    filenames = get_files_recursive(user_dir, "filesContainer", login)
 
-        if not os.path.exists(user_dir):
-            filenames = []
-            os.makedirs(user_dir, exist_ok = True)
-        else:
-            filenames = get_files_recursive(user_dir, "filesContainer", user.login)
-
-        shared_permissions = db.query(Permission).join(acl_records).filter(
-            acl_records.c.user_id == user.id,
-            acl_records.c.action == "read"
-        ).all()
-
-        for perm in shared_permissions:
-            phys_path = os.path.join(config.BASE_DIR, perm.dirname)
-
-            if os.path.exists(phys_path):
-                parts = perm.dirname.strip('/').split('/')
-                owner_login = parts[0]
-                resource_name = parts[-1]
-
-                shared_id = f"shared_{perm.id}"
-
-                if os.path.isdir(phys_path):
-                    filenames.append({
-                        "id": shared_id,
-                        "name": f"shared {resource_name} (from {owner_login})",
-                        "parent_id": "filesContainer",
-                        "type": "dir",
-                        "path": perm.dirname + "/"
-                    })
-                    shared_files = get_files_recursive(phys_path, shared_id, perm.dirname + "/")
-                    filenames += shared_files
-                elif os.path.isfile(phys_path):
-                    filenames.append({
-                        "id": shared_id,
-                        "name": f"shared {resource_name} (from {owner_login})",
-                        "parent_id": "filesContainer",
-                        "type": "file",
-                        "path": perm.dirname
-                    })
-    else:
-        user_dir = config.BASE_DIR
-        filenames = get_files_recursive(user_dir, "filesContainer")
-
-    print(filenames)
-    return {"username": user.login, "files": filenames}
+    return {"username": login, "files": filenames}
 
 def get_file_path(filename: str, user: User = Depends(dependencies.get_current_user)):
     safe_path = os.path.join(config.BASE_DIR, filename)
@@ -170,8 +131,6 @@ async def delete_file(filename: str, user: User = Depends(dependencies.get_curre
 
     await aiofiles.os.remove(real_file_path)
 
-    return "Success"
-
 async def add_directory(dirname: str, user: User = Depends(dependencies.get_current_user)):
     dir_path = os.path.abspath(os.path.join(config.BASE_DIR, user.login))
     new_dir_path = os.path.abspath(os.path.join(dir_path, dirname))
@@ -182,5 +141,3 @@ async def add_directory(dirname: str, user: User = Depends(dependencies.get_curr
     if os.path.exists(new_dir_path): raise HTTPException(status_code = 404, detail = "Directory already exists")
 
     await aiofiles.os.mkdir(new_dir_path)
-
-    return "Success"
