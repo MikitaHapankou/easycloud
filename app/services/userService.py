@@ -1,15 +1,15 @@
 import os
 from app.config import config
-from fastapi import HTTPException, Response
+from fastapi import HTTPException, Response, Depends
 from app.models.user import userRequest
-from app.dependencies import raise_auth_error
+from app.dependencies import raise_auth_error, get_supabase
 from supabase import AuthApiError
 
-def add_user(response: Response, user_data: userRequest):
+def add_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
     login = user_data.login
     password = user_data.password
     try:
-        supabase_response = config.supabase.auth.sign_up(
+        supabase_response = supabase.auth.sign_up(
             {
                 "email": login,
                 "password": password,
@@ -34,11 +34,12 @@ def add_user(response: Response, user_data: userRequest):
     except Exception as e:
         raise HTTPException(status_code = 500, detail = "Internal server error")
 
-def auth_user(response: Response, user_data: userRequest):
+def auth_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
     login: str = user_data.login
     password: str = user_data.password
     try:
-        supabase_response = config.supabase.auth.sign_in_with_password(
+
+        supabase_response = supabase.auth.sign_in_with_password(
             {
                 "email": login,
                 "password": password,
