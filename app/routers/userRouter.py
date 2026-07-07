@@ -1,10 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, Response, Cookie
-from app.schemas.user import userRequest, userORM
+from fastapi import APIRouter, Cookie, Depends, Response
 from app import dependencies
-from app.services import security
-from sqlalchemy.orm import Session
 from app.services import userService
-from app.models.user import User
+from app.models.user import CurrentUser
 router = APIRouter(prefix = "/users", tags = ["users"])
 
 @router.post("/add")
@@ -22,12 +19,5 @@ def logout(response: Response):
 
 ### ENDPOINTS FOR TESTS SECTION
 @router.get("/authenticate", tags = ["tests"])
-def token(user: User = Depends(dependencies.get_current_user)):
+def token(user: CurrentUser = Depends(dependencies.get_current_user)):
     return user
-
-@router.get("/get-all", response_model = list[userORM], tags = ["tests"])
-def get_all_users(db: Session = Depends(dependencies.get_db)):
-    try:
-        return userService.get_users(db)
-    except Exception:
-        raise HTTPException(status_code = 400, detail = "error")

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from app.config import config
 from fastapi.responses import FileResponse
-from app.schemas.dashboard import dashboardFileList
+from app.models.dashboard import dashboardFileList
 from app.services import dashboardService
 import os
 router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
@@ -11,10 +11,6 @@ def get_dashboard(request: Request):
     return FileResponse(path = os.path.join(config.TEMPLATE_DIR, "dashboard.html"))
 @router.get("/download/{filename:path}")
 def get_file(result = Depends(dashboardService.get_file_path)):
-    return result
-
-@router.post("/share")
-def share_folder(result = Depends(dashboardService.share_directory)):
     return result
 
 @router.get("/my", response_model = dashboardFileList)

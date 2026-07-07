@@ -19,17 +19,10 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     SUPABASE_PROJECT_URL: str
     SUPABASE_KEY: str
-    JWT_SECRET: str
-    JWT_EXPIRE_MINUTES: int
-    JWT_ALGO: str
 
     def get_db_url(self):
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.DATABASE_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()
-
-class Role(Enum):
-    ADMIN = 1
-    USER = 2
 
 supabase: Client = create_client(settings.SUPABASE_PROJECT_URL, settings.SUPABASE_KEY)

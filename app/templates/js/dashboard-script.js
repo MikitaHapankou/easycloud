@@ -70,32 +70,6 @@ document.getElementById("logout-btn").addEventListener("click", () => {
                         a.href = `/dashboard/download/${node["path"]}`;
                         a.innerText = node["name"];
 
-                        const shareBtn = document.createElement("button");
-                        shareBtn.innerText = "Share";
-                        shareBtn.classList.add("share-btn");
-
-                        shareBtn.onclick = async () => {
-                            const targetLogin = prompt(`Sharing folder '${node.name}'.\nType in user login you want to share with:`);
-
-                            if (targetLogin) {
-                                try {
-                                    const response = await fetch(`/dashboard/share?dirname=${node.path}&target_login=${targetLogin}&action=read`, {
-                                        method: "POST"
-                                    });
-
-                                    const result = await response.json();
-
-                                    if (response.ok) {
-                                        alert("Success " + result.detail);
-                                    } else {
-                                        alert("Error: " + result.detail);
-                                    }
-                                } catch (error) {
-                                    alert("An error occured");
-                                }
-                            }
-                        };
-
                         const deleteBtn = document.createElement("button");
                         deleteBtn.innerText = "Delete";
                         deleteBtn.classList.add("delete-btn");
@@ -121,7 +95,6 @@ document.getElementById("logout-btn").addEventListener("click", () => {
                         };
 
                         fileWrapper.appendChild(a);
-                        fileWrapper.appendChild(shareBtn);
                         fileWrapper.appendChild(deleteBtn);
 
                         parentElement.appendChild(fileWrapper);
