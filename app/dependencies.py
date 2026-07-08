@@ -31,10 +31,6 @@ def get_current_user(token = Cookie(None)) -> CurrentUser:
     except AuthApiError as auth_error:
         raise_auth_error(auth_error)
 
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code = 500, detail = "Internal server error")
-
 def get_supabase() -> Client:
     supabase: Client = create_client(config.settings.SUPABASE_PROJECT_URL, config.settings.SUPABASE_KEY)
 

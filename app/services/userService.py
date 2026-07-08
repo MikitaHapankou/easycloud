@@ -31,9 +31,6 @@ def add_user(response: Response, user_data: userRequest, supabase = Depends(get_
     except AuthApiError as auth_error:
         raise_auth_error(auth_error)
 
-    except Exception as e:
-        raise HTTPException(status_code = 500, detail = "Internal server error")
-
 def logout_user(response: Response, user: CurrentUser = Depends(get_current_user), supabase = Depends(get_supabase)):
     response.delete_cookie(
         key="token",
@@ -47,9 +44,6 @@ def logout_user(response: Response, user: CurrentUser = Depends(get_current_user
     except AuthApiError as auth_error:
         raise_auth_error(auth_error)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
-
 def auth_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
     login: str = user_data.login
     password: str = user_data.password
@@ -62,6 +56,8 @@ def auth_user(response: Response, user_data: userRequest, supabase = Depends(get
             }
         )
 
+        raise Exception("Test")
+
         token = supabase_response.session.access_token
         response.set_cookie(
             key = "token",
@@ -73,6 +69,3 @@ def auth_user(response: Response, user_data: userRequest, supabase = Depends(get
 
     except AuthApiError as auth_error:
         raise_auth_error(auth_error)
-
-    except Exception as e:
-        raise HTTPException(status_code = 500, detail = "Internal server error")

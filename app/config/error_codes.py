@@ -39,3 +39,4 @@ AUTH_ERROR_MAP = {
     "request_timeout": (504, "request_timeout"),
     "unexpected_failure": (500, "unexpected_failure"),
 }
+
