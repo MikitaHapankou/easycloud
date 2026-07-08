@@ -7,6 +7,18 @@ from app import dependencies
 import aiofiles, aiofiles.os
 import uuid
 
+def check_path_safety(filename: str, user_login: str):
+    safe_path = os.path.join(config.BASE_DIR, filename)
+    file_path = os.path.abspath(safe_path)
+
+    if not file_path.startswith(os.path.join(config.BASE_DIR, user_login)):
+        raise HTTPException(status_code=400, detail="Bad filename")
+
+    if not os.path.isfile(file_path):
+        raise HTTPException(status_code=404, detail="File doesn't exist")
+
+    return file_path
+
 def get_files_recursive(directory, parent_id: str, name = ""):
     files = []
     for content in os.listdir(directory):
@@ -30,19 +42,9 @@ def get_user_files(user: CurrentUser = Depends(dependencies.get_current_user)):
     return {"username": user.login, "files": filenames}
 
 def get_file_path(filename: str, user: CurrentUser = Depends(dependencies.get_current_user)):
-    safe_path = os.path.join(config.BASE_DIR, filename)
-    file_path = os.path.abspath(safe_path)
+    safe_path = check_path_safety(filename, user.login)
 
-    if not file_path.startswith(os.path.join(config.BASE_DIR, user.login)):
-        raise HTTPException(status_code=400, detail="Bad filename")
-
-    if not file_path.startswith(config.BASE_DIR):
-        raise HTTPException(status_code = 400, detail = "Bad filename")
-
-    if not os.path.isfile(file_path):
-        raise HTTPException(status_code = 404, detail = "File doesn't exist")
-
-    return FileResponse(file_path, filename = os.path.basename(filename))
+    return safe_path
 
 async def add_new_file(uploaded_file: UploadFile = File(...), user: CurrentUser = Depends(dependencies.get_current_user)):
     safe_filename = os.path.basename(uploaded_file.filename)
@@ -67,17 +69,8 @@ async def add_new_file(uploaded_file: UploadFile = File(...), user: CurrentUser 
         raise HTTPException(status_code=500, detail="Couldn't save file")
 
 async def delete_file(filename: str, user: CurrentUser = Depends(dependencies.get_current_user)):
-    file_path = os.path.join(config.BASE_DIR, filename)
-    real_file_path = os.path.abspath(file_path)
-
-    user_path = os.path.join(config.BASE_DIR, user.login)
-    if not real_file_path.startswith(user_path):
-        raise HTTPException(status_code = 400, detail = "Invalid filename")
-
-    isfile = await aiofiles.os.path.isfile(real_file_path)
-    if not isfile: raise HTTPException(status_code = 404, detail = "File not found")
-
-    await aiofiles.os.remove(real_file_path)
+    safe_path = check_path_safety(filename, user.login)
+    await aiofiles.os.remove(safe_path)
 
 async def add_directory(dirname: str, user: CurrentUser = Depends(dependencies.get_current_user)):
     dir_path = os.path.abspath(os.path.join(config.BASE_DIR, user.login))

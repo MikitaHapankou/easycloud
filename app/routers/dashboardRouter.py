@@ -10,8 +10,8 @@ router = APIRouter(prefix = "/dashboard", tags = ["dashboard"])
 def get_dashboard(request: Request):
     return FileResponse(path = os.path.join(config.TEMPLATE_DIR, "dashboard.html"))
 @router.get("/download/{filename:path}")
-def get_file(result = Depends(dashboardService.get_file_path)):
-    return result
+def get_file(file_path = Depends(dashboardService.get_file_path)):
+    return FileResponse(file_path)
 
 @router.get("/my", response_model = dashboardFileList)
 def get_files(user_files: dict = Depends(dashboardService.get_user_files)):
