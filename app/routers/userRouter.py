@@ -12,10 +12,8 @@ def auth_user(result = Depends(userService.auth_user)):
     return result
 
 @router.get("/logout")
-def logout(response: Response):
-    response.delete_cookie(
-        key="token",
-    )
+def logout(result = Depends(userService.logout_user)):
+    return result
 
 ### ENDPOINTS FOR TESTS SECTION
 @router.get("/authenticate", tags = ["tests"])

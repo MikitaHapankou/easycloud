@@ -1,8 +1,8 @@
 import os
 from app.config import config
 from fastapi import HTTPException, Response, Depends
-from app.models.user import userRequest
-from app.dependencies import raise_auth_error, get_supabase
+from app.models.user import userRequest, CurrentUser
+from app.dependencies import raise_auth_error, get_supabase, get_current_user
 from supabase import AuthApiError
 
 def add_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
@@ -33,6 +33,22 @@ def add_user(response: Response, user_data: userRequest, supabase = Depends(get_
 
     except Exception as e:
         raise HTTPException(status_code = 500, detail = "Internal server error")
+
+def logout_user(response: Response, user: CurrentUser = Depends(get_current_user), supabase = Depends(get_supabase)):
+    response.delete_cookie(
+        key="token",
+    )
+
+    deprecated_token = user.token
+    try:
+        supabase.auth.set_session(deprecated_token, "")
+        supabase.auth.sign_out()
+
+    except AuthApiError as auth_error:
+        raise_auth_error(auth_error)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 def auth_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
     login: str = user_data.login

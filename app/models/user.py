@@ -6,3 +6,4 @@ class userRequest(BaseModel):
 
 class CurrentUser(BaseModel):
     login: str
+    token: str

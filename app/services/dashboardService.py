@@ -2,7 +2,6 @@ import os
 from app.models.user import CurrentUser
 from app.config import config
 from fastapi import Depends, HTTPException, File, UploadFile
-from fastapi.responses import FileResponse
 from app import dependencies
 import aiofiles, aiofiles.os
 import uuid

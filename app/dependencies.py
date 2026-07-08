@@ -26,7 +26,7 @@ def get_current_user(token = Cookie(None)) -> CurrentUser:
         supabase.auth.set_session(token, "")
         supabase_response = supabase.auth.get_user()
         login = supabase_response.user.email
-        return CurrentUser(login = login)
+        return CurrentUser(login = login, token = token)
 
     except AuthApiError as auth_error:
         raise_auth_error(auth_error)
