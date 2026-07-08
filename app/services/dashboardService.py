@@ -5,16 +5,17 @@ from fastapi import Depends, HTTPException, File, UploadFile
 from app import dependencies
 import aiofiles, aiofiles.os
 import uuid
+from app.config.error_codes import FileTooLarge, BadFilename, FileExists, FileNotExist, BadDirectory, DirectoryExists
 
 def check_path_safety(filename: str, user_login: str):
     safe_path = os.path.join(config.BASE_DIR, filename)
     file_path = os.path.abspath(safe_path)
 
     if not file_path.startswith(os.path.join(config.BASE_DIR, user_login)):
-        raise HTTPException(status_code=400, detail="Bad filename")
+        raise BadFilename
 
     if not os.path.isfile(file_path):
-        raise HTTPException(status_code=404, detail="File doesn't exist")
+        raise FileNotExist
 
     return file_path
 
@@ -49,23 +50,15 @@ async def add_new_file(uploaded_file: UploadFile = File(...), user: CurrentUser 
     safe_filename = os.path.basename(uploaded_file.filename)
     real_file_path = os.path.join(config.BASE_DIR, user.login, safe_filename)
 
-    try:
-        if await aiofiles.os.path.exists(real_file_path):
-            raise HTTPException(status_code=404, detail="File already exists")
+    if await aiofiles.os.path.exists(real_file_path):
+        raise FileExists
 
-        if uploaded_file.size > 500 * (10 ** 6):
-            raise HTTPException(status_code=400, detail="File is too big")
+    if uploaded_file.size > 500 * (10 ** 6):
+        raise FileTooLarge
 
-        async with aiofiles.open(real_file_path, 'wb') as real_file:
-            while chunk := await uploaded_file.read(1024 * 64):
-                await real_file.write(chunk)
-
-        return "Success"
-
-    except HTTPException as e:
-        raise e
-    except Exception:
-        raise HTTPException(status_code=500, detail="Couldn't save file")
+    async with aiofiles.open(real_file_path, 'wb') as real_file:
+        while chunk := await uploaded_file.read(1024 * 64):
+            await real_file.write(chunk)
 
 async def delete_file(filename: str, user: CurrentUser = Depends(dependencies.get_current_user)):
     safe_path = check_path_safety(filename, user.login)
@@ -76,8 +69,9 @@ async def add_directory(dirname: str, user: CurrentUser = Depends(dependencies.g
     new_dir_path = os.path.abspath(os.path.join(dir_path, dirname))
 
     if not new_dir_path.startswith(dir_path):
-        raise HTTPException(status_code = 400, detail = "Invalid directory name")
+        raise BadDirectory
 
-    if os.path.exists(new_dir_path): raise HTTPException(status_code = 404, detail = "Directory already exists")
+    if os.path.exists(new_dir_path):
+        raise DirectoryExists
 
     await aiofiles.os.mkdir(new_dir_path)

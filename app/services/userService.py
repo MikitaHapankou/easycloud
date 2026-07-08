@@ -36,14 +36,6 @@ def logout_user(response: Response, user: CurrentUser = Depends(get_current_user
         key="token",
     )
 
-    deprecated_token = user.token
-    try:
-        supabase.auth.set_session(deprecated_token, "")
-        supabase.auth.sign_out()
-
-    except AuthApiError as auth_error:
-        raise_auth_error(auth_error)
-
 def auth_user(response: Response, user_data: userRequest, supabase = Depends(get_supabase)):
     login: str = user_data.login
     password: str = user_data.password
@@ -55,8 +47,6 @@ def auth_user(response: Response, user_data: userRequest, supabase = Depends(get
                 "password": password,
             }
         )
-
-        raise Exception("Test")
 
         token = supabase_response.session.access_token
         response.set_cookie(

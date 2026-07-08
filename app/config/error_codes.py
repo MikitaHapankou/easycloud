@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 # SUPABASE AUTH ERROR CODES
 AUTH_ERROR_MAP = {
     # Authentication
@@ -40,3 +42,52 @@ AUTH_ERROR_MAP = {
     "unexpected_failure": (500, "unexpected_failure"),
 }
 
+# FILE_ERRORS
+class FileTooLarge(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=413,
+            detail="FILE_TOO_LARGE"
+        )
+
+class BadFilename(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            detail="BAD_FILENAME"
+        )
+
+class FileExists(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=409,
+            detail="FILE_ALREADY_EXISTS"
+        )
+
+class FileNotExist(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=404,
+            detail="FILE_NOT_FOUND"
+        )
+
+class BadDirectory(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            detail="INVALID_DIRECTORY_NAME"
+        )
+
+class DirectoryExists(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=404,
+            detail="DIRECTORY_ALREADY_EXISTS"
+        )
+
+class TokenMissing(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=401,
+            detail="JWT_MISSING"
+        )

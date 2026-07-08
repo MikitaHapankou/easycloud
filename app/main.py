@@ -21,11 +21,12 @@ Base.metadata.create_all(bind = engine)
 @app.exception_handler(Exception)
 async def internal_error_handler(request: Request, exc: Exception):
     return JSONResponse(
-        status_code=500,
-        content={
+        status_code = 500,
+        content = {
             "detail": "Internal server error"
         }
     )
+
 @app.get("/", response_class = FileResponse)
 def read_root(request: Request):
     return FileResponse(os.path.join(config.TEMPLATE_DIR, "login.html"))
