@@ -21,14 +21,10 @@ def get_current_user(token = Cookie(None)) -> CurrentUser:
     if not token:
         raise TokenMissing
 
-    try:
-        supabase: Client = create_client(config.settings.SUPABASE_PROJECT_URL, config.settings.SUPABASE_KEY)
-        supabase_response = supabase.auth.get_user(token)
-        login = supabase_response.user.email
-        return CurrentUser(login = login, token = token)
-
-    except AuthApiError as auth_error:
-        raise_auth_error(auth_error)
+    supabase: Client = create_client(config.settings.SUPABASE_PROJECT_URL, config.settings.SUPABASE_KEY)
+    supabase_response = supabase.auth.get_user(token)
+    login = supabase_response.user.email
+    return CurrentUser(login = login, token = token)
 
 def get_supabase() -> Client:
     supabase: Client = create_client(config.settings.SUPABASE_PROJECT_URL, config.settings.SUPABASE_KEY)

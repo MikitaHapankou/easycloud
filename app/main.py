@@ -6,10 +6,12 @@ from fastapi.staticfiles import StaticFiles
 
 #Database
 from app.db.database import Base, engine
-from app.config import config
+from supabase import AuthApiError
 
-#os
+from app.config import config
+from app.dependencies import raise_auth_error
 import os
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="app/templates"), name="static")
@@ -26,6 +28,10 @@ async def internal_error_handler(request: Request, exc: Exception):
             "detail": "Internal server error"
         }
     )
+
+@app.exception_handler(AuthApiError)
+async def auth_error_handler(request: Request, exc: AuthApiError):
+    raise_auth_error(exc)
 
 @app.get("/", response_class = FileResponse)
 def read_root(request: Request):
