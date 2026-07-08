@@ -15,7 +15,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
             if (res.ok) {
                 alert("Registration success");
-                window.location.href = "/";
+                window.location.href = "/dashboard";
             } else {
                 alert(data.detail);
             }
