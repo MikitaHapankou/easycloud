@@ -44,15 +44,15 @@ document.getElementById("logout-btn").addEventListener("click", () => {
 
                     if (node.type === 'dir'){
                         const dir = document.createElement("div");
-                        dir.classList.add("dir");
+                        dir.classList.add("dir", "mb-1");
                         dir.id = node["id"];
 
                         const dirHeader = document.createElement("div");
-                        dirHeader.classList.add("dir-header");
+                        dirHeader.classList.add("dir-header", "font-semibold", "text-gray-800", "py-2", "px-3");
                         dirHeader.innerText = node.name;
 
                         const childrenContainer = document.createElement("div");
-                        childrenContainer.classList.add("dir-children");
+                        childrenContainer.classList.add("dir-children", "pl-4", "flex", "flex-col", "gap-1");
 
                         dir.appendChild(dirHeader);
                         dir.appendChild(childrenContainer);
@@ -63,16 +63,17 @@ document.getElementById("logout-btn").addEventListener("click", () => {
                     }
                     else {
                         const fileWrapper = document.createElement("div");
-                        fileWrapper.classList.add("file-wrapper");
+                        fileWrapper.classList.add("file-wrapper", "flex", "items-center", "justify-between", "gap-3", "py-2", "px-3", "rounded-lg", "hover:bg-gray-50", "transition-colors");
 
                         const a = document.createElement("a");
-                        a.classList.add("file-item");
+                        a.classList.add("file-item", "text-gray-700", "hover:text-blue-400", "truncate", "flex-1");
                         a.href = `/dashboard/download/${node["path"]}`;
                         a.innerText = node["name"];
 
                         const deleteBtn = document.createElement("button");
                         deleteBtn.innerText = "Delete";
-                        deleteBtn.classList.add("delete-btn");
+                        deleteBtn.classList.add("delete-btn", "text-sm", "font-medium", "text-red-500", "border", "border-red-500", "rounded-md", "px-3", "py-1", "hover:bg-red-500", "hover:text-white", "transition-colors");
+                        deleteBtn.type = "button";
 
                         deleteBtn.onclick = async () => {
                             try{
