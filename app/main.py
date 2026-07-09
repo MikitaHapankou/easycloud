@@ -1,7 +1,7 @@
 # Fastapi
 from fastapi import FastAPI, Request
 from app.routers import userRouter, dashboardRouter
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 #Database
@@ -33,8 +33,12 @@ async def internal_error_handler(request: Request, exc: Exception):
 async def auth_error_handler(request: Request, exc: AuthApiError):
     raise_auth_error(exc)
 
-@app.get("/", response_class = FileResponse)
+@app.get("/", response_class = RedirectResponse)
 def read_root(request: Request):
+    return RedirectResponse(url = "/login")
+
+@app.get("/login", response_class = FileResponse)
+def read_login(request: Request):
     return FileResponse(os.path.join(config.TEMPLATE_DIR, "login.html"))
 
 @app.get("/register", response_class = FileResponse)
