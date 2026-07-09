@@ -11,7 +11,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
         const data = await res.json()
 
         if (res.ok) {
-            document.querySelector(".username").innerText = data.username;
+            document.querySelector("#username").innerText = data.username;
 
             const itemMap = {};
             const rootItems = [];

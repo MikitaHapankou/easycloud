@@ -3,246 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>easycloud Dashboard</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            background: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #1e1e20;
-        }
-
-        .topbar {
-            width: 100%;
-            height: 64px;
-            background: #ffffff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 32px;
-            border-bottom: 1px solid #e5e8eb;
-        }
-
-        .logo {
-            color: #0061fe;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .username {
-            color: #4b5563;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .logout-btn {
-            padding: 8px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #ffffff;
-            color: #1e1e20;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .logout-btn:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-        }
-
-        .delete-btn {
-            padding: 6px 12px;
-            background: #ffffff;
-            border: 1px solid #ef4444;
-            border-radius: 4px;
-            color: #ef4444;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s ease;
-            margin-left: 8px;
-        }
-
-        .delete-btn:hover {
-            background: #fef2f2;
-        }
-
-        .share-btn {
-            padding: 6px 12px;
-            background: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            color: #1e1e20;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s ease;
-            margin-left: auto;
-        }
-
-        .share-btn:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-        }
-
-        .dashboard-wrapper {
-            display: flex;
-            justify-content: center;
-            padding: 40px 24px;
-        }
-
-        .dashboard-card {
-            width: 100%;
-            max-width: 1000px;
-            background: #ffffff;
-            padding: 0;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e5e8eb;
-        }
-
-        .dashboard-header h1 {
-            color: #1e1e20;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .upload-btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            background: #0061fe;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .upload-btn input {
-            display: none;
-        }
-
-        .upload-btn:hover {
-            background: #0050d1;
-        }
-
-        .files-container {
-            background: #ffffff;
-            min-height: 300px;
-        }
-
-        .dir {
-        }
-
-        .dir-header {
-            display: flex;
-            align-items: center;
-            background: #ffffff;
-            color: #1e1e20;
-            padding: 12px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-            transition: 0.2s ease;
-            cursor: pointer;
-        }
-
-        .dir-header:hover {
-            background: #f7f9fa;
-        }
-
-        .dir-children {
-            margin-left: 20px;
-            margin-top: 4px;
-            border-left: 1px solid #e5e8eb;
-            padding-left: 12px;
-        }
-
-        .dir-children:empty {
-            display: none;
-        }
-
-        .file-wrapper {
-            display: flex;
-            align-items: center;
-            padding: 8px 16px;
-            margin-bottom: 2px;
-            border-radius: 6px;
-            border-bottom: 1px solid #f3f4f6;
-            transition: 0.2s ease;
-        }
-
-        .file-wrapper:hover {
-            background: #f7f9fa;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-            background: transparent;
-            color: #1e1e20;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-    </style>
+    <title>easycloud dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="flex flex-col min-h-screen bg-slate-500">
 
-<div class="topbar">
-    <div class="logo">
-        easycloud
-    </div>
-    <div class="topbar-right">
-        <div class="username">
-            Username
+    <div class="flex w-full h-16 items-center justify-between px-8 bg-white shadow-sm">
+        <div class="text-blue-400 text-3xl font-bold">
+            easycloud
         </div>
-        <button class="logout-btn" type="button" id="logout-btn">
-            Logout
-        </button>
-    </div>
-</div>
 
-<div class="dashboard-wrapper">
-    <div class="dashboard-card">
-        <div class="dashboard-header">
-            <h1>My Files</h1>
-            <div class="upload-btn">
-                <label for="input" style="cursor:pointer;">Upload file</label>
-                <input type="file" id="input" multiple />
+        <div class="flex items-center gap-6">
+            <div class="text-gray-800 font-medium" id="username">
+                Username
             </div>
-        </div>
-        <div class="files-container" id="filesContainer">
+            <button class="text-blue-400 font-medium hover:text-blue-500 transition-colors" type="button" id="logout-btn">
+                Logout
+            </button>
         </div>
     </div>
-</div>
 
-<script src = "/static/js/dashboard-script.js"></script>
+    <main class="flex-1 w-full max-w-5xl mx-auto p-6 mt-4 md:mt-8">
 
+        <div class="bg-white w-full p-10 rounded-3xl shadow-lg">
+
+            <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-100">
+                <h1 class="text-2xl font-bold text-gray-800">My Files</h1>
+
+                <div>
+                    <label for="input" class="inline-block rounded-md p-1.5 px-5 bg-blue-400 text-md text-white font-medium cursor-pointer hover:bg-blue-500 transition-colors shadow-sm">
+                        Upload file
+                    </label>
+                    <input type="file" id="input" multiple class="hidden" />
+                </div>
+            </div>
+
+            <div class="min-h-[300px] flex flex-col gap-1" id="filesContainer">
+                </div>
+
+        </div>
+    </main>
+
+    <script src="/static/js/dashboard-script.js"></script>
 </body>
 </html>

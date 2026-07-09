@@ -6,7 +6,7 @@ export function showError(fieldId, message) {
         errorMsg.innerText = message;
         errorMsg.classList.remove("hidden");
 
-        input.classList.remove("border-gray-300");
+        input.classList.remove("border-slate-300");
         input.classList.add("border-red-500", "text-red-600", "focus:border-red-500");
     }
 }
@@ -20,7 +20,7 @@ export function clearErrors() {
             errorMsg.classList.add("hidden");
 
             input.classList.remove("border-red-500", "text-red-600", "focus:border-red-500");
-            input.classList.add("border-gray-300");
+            input.classList.add("border-slate-300");
         }
     });
 }
@@ -28,7 +28,7 @@ export function clearErrors() {
 export function highlightInputError(fieldId) {
     const input = document.getElementById(fieldId);
     if (input) {
-        input.classList.remove("border-gray-300");
+        input.classList.remove("border-slate-300");
         input.classList.add("border-red-500", "text-red-600", "focus:border-red-500");
     }
 }
