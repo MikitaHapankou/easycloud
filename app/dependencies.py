@@ -2,7 +2,7 @@ from app.db.database import LocalSession
 from app.config.error_codes import AUTH_ERROR_MAP, TokenMissing
 from fastapi import HTTPException, Cookie
 from app.config import config
-from supabase import AuthApiError, create_client, Client
+from supabase import AuthError, create_client, Client
 from app.models.user import CurrentUser
 
 def get_db():
@@ -12,7 +12,7 @@ def get_db():
     finally:
         db.close()
 
-def raise_auth_error(auth_error: AuthApiError):
+def raise_auth_error(auth_error: AuthError):
     status_code, message = AUTH_ERROR_MAP.get(auth_error.code, (500, "Internal server error"))
 
     raise HTTPException(status_code = status_code, detail = message)

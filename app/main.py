@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 #Database
 from app.db.database import Base, engine
-from supabase import AuthApiError
+from supabase import AuthError
 
 from app.config import config
 from app.dependencies import raise_auth_error
@@ -29,8 +29,8 @@ async def internal_error_handler(request: Request, exc: Exception):
         }
     )
 
-@app.exception_handler(AuthApiError)
-async def auth_error_handler(request: Request, exc: AuthApiError):
+@app.exception_handler(AuthError)
+async def auth_error_handler(request: Request, exc: AuthError):
     raise_auth_error(exc)
 
 @app.get("/", response_class = RedirectResponse)
