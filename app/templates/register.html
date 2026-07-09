@@ -15,17 +15,21 @@
         <div>
             <label class = "block text-sm font-medium mb-2">Login</label>
             <input class = "w-full border-solid border-2 rounded-md p-2" type="text" id="login" placeholder="Enter your email">
+
+            <p id="login-error" class="hidden text-xs text-red-500 mt-1 font-medium"></p>
         </div>
 
         <div>
             <label class = "block text-sm font-medium mb-2">Password</label>
             <input class = "w-full border-solid border-2 rounded-md p-2" type="password" id="password" placeholder="Enter your password">
+
+            <p id="password-error" class="hidden text-xs text-red-500 mt-1.5 font-medium"></p>
         </div>
 
         <button class = "w-full rounded-md p-1.5 bg-blue-400 text-md text-white" type="submit">Register</button>
     </form>
 
-    <script src = "/static/js/register-script.js"></script>
+    <script type="module" src = "/static/js/register-script.js"></script>
 
     <p class = "w-full text-center mt-1.5">
         Already have an account? <a href="/login" class = "text-blue-400">Sign in</a>
